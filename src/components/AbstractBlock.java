@@ -6,10 +6,8 @@ import java.util.ArrayList;
 
 public abstract class AbstractBlock implements Block{
     private static int countID = 0;
-    private int countPriority = 0;
     private ArrayList<Port> inPort;
     private ArrayList<Port> outPort;
-    private ArrayList<Integer> priorityInPort;
     private int id;
     private double x_coord;
     private double y_coord;
@@ -20,15 +18,12 @@ public abstract class AbstractBlock implements Block{
         this.y_coord = y;
         this.inPort = new ArrayList<>();
         this.outPort = new ArrayList<>();
-        this.priorityInPort = new ArrayList<>();
         Port inPort1 = new Port();
         Port inPort2 = new Port();
         Port outPort1 = new Port();
         this.inPort.add(inPort1);
         this.inPort.add(inPort2);
         this.outPort.add(outPort1);
-        this.priorityInPort.add((++countPriority));
-        this.priorityInPort.add((++countPriority));
     }
 
     public int getId() {
@@ -57,7 +52,6 @@ public abstract class AbstractBlock implements Block{
 
     public void addInPort(){
         Port newInPort = new Port();
-        this.priorityInPort.add((++countPriority));
         this.inPort.add(newInPort);
     }
 
@@ -74,7 +68,6 @@ public abstract class AbstractBlock implements Block{
             return false;
         }
         this.inPort.remove(index);
-        this.priorityInPort.remove(index);
         return true;
     }
 
