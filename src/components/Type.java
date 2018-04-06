@@ -9,6 +9,8 @@ public class Type {
     private ArrayList<Double> value;
 
     public Type(){
+        type = new ArrayList<String>();
+        value = new ArrayList<Double>();
         String [] types = new String[20];
         types[0] = "Natural";
         types[1] = "8bit";
