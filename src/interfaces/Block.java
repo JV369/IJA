@@ -3,11 +3,9 @@ package interfaces;
 public interface Block {
     double calculate();
     double[] getCoordinates();
-    int getInPortID();
-    int getOutPortID();
+    int getInPortID(int index);
+    int getOutPortID(int index);
     //maybe?
-    void setInPortID();
-    void setOutPortID();
     void setCoordinates(double newX, double newY);
     //end maybe?
 

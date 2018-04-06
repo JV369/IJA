@@ -7,14 +7,14 @@ public class InPort extends Port {
     private int priority;
     public InPort(int id,int prior){
         super(id);
-        priority = prior;
+        this.priority = prior;
     }
 
     public int getPriority() {
-        return priority;
+        return this.priority;
     }
 
     public void setPriority(int newPriority){
-        priority = newPriority;
+        this.priority = newPriority;
     }
 }

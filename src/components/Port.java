@@ -7,19 +7,19 @@ public class Port {
     private Type value;
 
     public Port(int newId){
-        id = newId;
-        value = new Type();
+        this.id = newId;
+        this.value = new Type();
     }
 
     public int getId(){
-        return id;
+        return this.id;
     }
 
     public double getValue(String type) {
-        return value.getTypeValue(type);
+        return this.value.getTypeValue(type);
     }
 
     public boolean setValue(String type, double newValue){
-        return value.setTypeValue(type,newValue);
+        return this.value.setTypeValue(type,newValue);
     }
 }

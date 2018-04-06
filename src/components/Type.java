@@ -14,24 +14,24 @@ public class Type {
         types[1] = "8bit";
         types[2] = "Real";
         for(String newType : types){
-            type.add(newType);
-            value.add(0.0);
+            this.type.add(newType);
+            this.value.add(0.0);
         }
     }
 
     public double getTypeValue(String requestType){
-        for(int i = 0; i < type.size();i++){
-            if(type.get(i).equals(requestType)){
-                return value.get(i);
+        for(int i = 0; i < this.type.size();i++){
+            if(this.type.get(i).equals(requestType)){
+                return this.value.get(i);
             }
         }
         return NaN;
     }
 
     public boolean setTypeValue(String requestType, double requestValue){
-        for(int i = 0; i < type.size();i++){
-            if(type.get(i).equals(requestType)){
-                value.set(i,requestValue);
+        for(int i = 0; i < this.type.size();i++){
+            if(this.type.get(i).equals(requestType)){
+                this.value.set(i,requestValue);
                 return true;
             }
         }
