@@ -5,8 +5,8 @@ import components.Port;
 public class InPort extends Port {
 
     private int priority;
-    public InPort(int id,int prior){
-        super(id);
+    public InPort(int prior){
+        super();
         this.priority = prior;
     }
 

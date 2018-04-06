@@ -13,6 +13,8 @@ public class Type {
         types[0] = "Natural";
         types[1] = "8bit";
         types[2] = "Real";
+        this.type = new ArrayList<>();
+        this.value = new ArrayList<>();
         for(String newType : types){
             this.type.add(newType);
             this.value.add(0.0);
@@ -28,12 +30,29 @@ public class Type {
         return NaN;
     }
 
-    public boolean setTypeValue(String requestType, double requestValue){
+    public boolean setTypeValue(double requestValue){
         for(int i = 0; i < this.type.size();i++){
-            if(this.type.get(i).equals(requestType)){
-                this.value.set(i,requestValue);
-                return true;
+            switch (this.type.get(i)){
+                case "Natural":
+                    if(requestValue < 0){
+                        this.value.set(i,NaN);
+                        break;
+                    }
+                    this.value.set(i,Math.floor(requestValue));
+                    break;
+                case "8bit":
+                    if(requestValue < 0){
+                        this.value.set(i,NaN);
+                        break;
+                    }
+                    this.value.set(i,Math.floor(requestValue)%256);
+                    break;
+                case "Real":
+                    this.value.set(i,requestValue);
+                    break;
             }
+
+
         }
         return false;
     }
