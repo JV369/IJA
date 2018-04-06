@@ -74,6 +74,7 @@ public abstract class AbstractBlock implements Block{
             return false;
         }
         this.inPort.remove(index);
+        this.priorityInPort.remove(index);
         return true;
     }
 
