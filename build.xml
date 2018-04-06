@@ -4,6 +4,8 @@
     <property name="build" location="build"/>
     <property name="src.main" location="src/main"/>
     <property name="build.main" location="build/"/>
+    <property name="src.interfaces" location="src/interfaces"/>
+    <property name="build.interfaces" location="build"/>
     <property name="src.components" location="src/components"/>
     <property name="build.components" location="build"/>
     <property name="src.tests" location="src/tests"/>
@@ -19,6 +21,7 @@
     <target name="sources-compile" description="compile the source" depends="clean">
         <mkdir dir="${build.components}"/>
         <mkdir dir="${build.main}"/>
+        <javac srcdir="${src.interfaces}" destdir="${build.interfaces}" includeantruntime="false"/>
         <javac srcdir="${src.components}" destdir="${build.components}" includeantruntime="false"/>
         <javac srcdir="${src.main}" classpath="${build.components}" destdir="${build.main}" includeantruntime="false"/>
     </target>
