@@ -9,18 +9,20 @@ public class Port {
 
     public Port(){
         this.id = (count++);
-        this.value = new Type();
+        this.value = new Type("Real");
     }
 
     public int getId(){
         return this.id;
     }
 
-    public double getValue(String type) {
-        return this.value.getTypeValue(type);
+    public Type getType(){
+        return this.value;
     }
 
-    public boolean setValue(double newValue){
-        return this.value.setTypeValue(newValue);
+    public void setType(Type type){
+        String actType = type.getActiveType();
+        this.value.setActiveType(actType);
+        this.value.setTypeValue(type.getTypeValue(actType));
     }
 }

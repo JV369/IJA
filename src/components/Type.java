@@ -7,8 +7,9 @@ import static java.lang.Double.NaN;
 public class Type {
     private ArrayList<String> type;
     private ArrayList<Double> value;
+    private String activeType;
 
-    public Type(){
+    public Type(String type){
         String [] types = new String[3];
         types[0] = "Natural";
         types[1] = "8bit";
@@ -19,6 +20,7 @@ public class Type {
             this.type.add(newType);
             this.value.add(0.0);
         }
+        this.activeType = type;
     }
 
     public double getTypeValue(String requestType){
@@ -28,6 +30,20 @@ public class Type {
             }
         }
         return NaN;
+    }
+
+    public String getActiveType() {
+        return this.activeType;
+    }
+
+    public boolean setActiveType(String type){
+        for (String actType: this.type) {
+            if(actType.equals(type)){
+                this.activeType = actType;
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean setTypeValue(double requestValue){
