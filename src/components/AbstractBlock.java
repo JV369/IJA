@@ -7,8 +7,9 @@ import java.util.ArrayList;
 public abstract class AbstractBlock implements Block{
     private static int countID = 0;
     private int countPriority = 0;
-    private ArrayList<InPort> inPort;
+    private ArrayList<Port> inPort;
     private ArrayList<Port> outPort;
+    private ArrayList<Integer> priorityInPort;
     private int id;
     private double x_coord;
     private double y_coord;
@@ -19,13 +20,15 @@ public abstract class AbstractBlock implements Block{
         this.y_coord = y;
         this.inPort = new ArrayList<>();
         this.outPort = new ArrayList<>();
-        InPort inPort1 = new InPort((++this.countPriority));
-        InPort inPort2 = new InPort((++this.countPriority));
+        this.priorityInPort = new ArrayList<>();
+        Port inPort1 = new Port();
+        Port inPort2 = new Port();
         Port outPort1 = new Port();
         this.inPort.add(inPort1);
         this.inPort.add(inPort2);
         this.outPort.add(outPort1);
-
+        this.priorityInPort.add((++countPriority));
+        this.priorityInPort.add((++countPriority));
     }
 
     public int getId() {
@@ -53,12 +56,16 @@ public abstract class AbstractBlock implements Block{
     }
 
     public void addInPort(){
-        InPort newInPort = new InPort((++this.countPriority));
+        Port newInPort = new Port();
+        this.priorityInPort.add((++countPriority));
         this.inPort.add(newInPort);
     }
 
     public void addOutPort(){
         Port newOutPort = new Port();
+        String type = this.outPort.get(0).getType().getActiveType();
+        newOutPort.getType().setActiveType(type);
+        newOutPort.getType().setTypeValue(this.outPort.get(0).getType().getTypeValue(type));
         this.outPort.add(newOutPort);
     }
 
@@ -67,6 +74,7 @@ public abstract class AbstractBlock implements Block{
             return false;
         }
         this.inPort.remove(index);
+        this.priorityInPort.remove(index);
         return true;
     }
 
@@ -77,4 +85,5 @@ public abstract class AbstractBlock implements Block{
         this.outPort.remove(index);
         return true;
     }
+
 }

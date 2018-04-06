@@ -10,7 +10,7 @@ public class TypeTest {
 
     @Test
     public void setValue() {
-        Type type = new Type();
+        Type type = new Type("Real");
         assertTrue("Error seting value of Type", type.setTypeValue(420.00));
         //assertEquals(420.00, type.getTypeValue("Real"));
 
