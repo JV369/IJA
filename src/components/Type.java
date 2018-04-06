@@ -9,14 +9,12 @@ public class Type {
     private ArrayList<Double> value;
 
     public Type(){
-        type = new ArrayList<String>();
-        value = new ArrayList<Double>();
-        String [] types = new String[20];
+        String [] types = new String[3];
         types[0] = "Natural";
         types[1] = "8bit";
         types[2] = "Real";
-        this.type = new ArrayList<>();
-        this.value = new ArrayList<>();
+        this.type = new ArrayList<String>();
+        this.value = new ArrayList<Double>();
         for(String newType : types){
             this.type.add(newType);
             this.value.add(0.0);
@@ -53,9 +51,7 @@ public class Type {
                     this.value.set(i,requestValue);
                     break;
             }
-
-
         }
-        return false;
+        return true;
     }
 }
