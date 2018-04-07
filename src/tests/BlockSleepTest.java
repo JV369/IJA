@@ -3,27 +3,50 @@
 import components.AbstractBlock;
 import components.BlockSleep;
 import components.Port;
+import org.junit.Before;
 import org.junit.Test;
 import components.BlockSleep;
 import interfaces.Block;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class BlockSleepTest {
-    private BlockSleep block = new BlockSleep();
+    private BlockSleep block;
+
+    @Before
+    public void setUp() {
+        block = new BlockSleep();
+    }
 
     @Test
-    public void TestInstance() {
+    public void testInstance() {
         assertTrue(block instanceof AbstractBlock);
         assertTrue(block instanceof Block);
     }
 
     @Test
-    public void TestExecute(){
+    public void testInitValues(){
+        BlockSleep b2 = new BlockSleep();
+        assertEquals("Test ID 1", 1, block.getId());
+        assertEquals("Test ID 2", 2, b2.getId());
+        assertArrayEquals("Test coordinates", new double[]{0.0, 0.0}, block.getCoordinates(), 0.001);
+    }
+
+    @Test
+    public void testSetCoordinates(){
+        block.setCoordinates(42.0, 66.6);
+        assertArrayEquals("Test new coordinates", new double[]{42.0, 66.6}, block.getCoordinates(), 0.001);
+    }
+
+    @Test
+    public void testExecute(){
         block.getInPort(0).getType().update("stamina", 50.0);
+        block.execute();
+        assertEquals("Test stamina after sleep",57.5, block.getOutPort(0).getType().getValue("stamina"), 0.001);
         block.getInPort(1).getType().update("hours", 2.0);
         block.execute();
-        assertEquals(87.5, block.getOutPort(0).getType().getValue("stamina"), 0.001);
+        assertEquals("Test stamina after sleep 2", 87.5, block.getOutPort(0).getType().getValue("stamina"), 0.001);
     }
 }

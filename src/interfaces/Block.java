@@ -3,7 +3,7 @@ package interfaces;
 import components.Port;
 
 public interface Block {
-    boolean execute();
+    void execute();
     int getId();
     double[] getCoordinates();
     Port getInPort(int index);

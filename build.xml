@@ -21,9 +21,10 @@
     <target name="sources-compile" description="compile the source" depends="clean">
         <mkdir dir="${build.components}"/>
         <mkdir dir="${build.main}"/>
-        <javac srcdir="${src.interfaces}" destdir="${build.interfaces}" includeantruntime="false"/>
+        <javac srcdir="${src}" excludes="tests/*" destdir="${build}" includeantruntime="false"/>
+        <!--<javac srcdir="${src.interfaces}" destdir="${build.interfaces}" includeantruntime="false"/>
         <javac srcdir="${src.components}" destdir="${build.components}" includeantruntime="false"/>
-        <javac srcdir="${src.main}" classpath="${build.components}" destdir="${build.main}" includeantruntime="false"/>
+        <javac srcdir="${src.main}" classpath="${build.components}" destdir="${build.main}" includeantruntime="false"/>-->
     </target>
 <!-- prepared to make an run jar archive
     <target name="compile-jar" depends="sources-compile" description="create .jar archive">
