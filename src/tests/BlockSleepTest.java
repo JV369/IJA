@@ -2,9 +2,7 @@
 
 import components.AbstractBlock;
 import components.BlockSleep;
-import components.Port;
 import org.junit.Test;
-import components.BlockSleep;
 import interfaces.Block;
 
 import static org.junit.Assert.assertEquals;

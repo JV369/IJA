@@ -1,6 +1,6 @@
 package components;
 
-public class BlockSleep extends AbstractBlock{
+public class BlockSleep extends AbstractBlock {
     public BlockSleep(){
         super();
         this.inPort.add(new Port("Human"));

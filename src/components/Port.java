@@ -1,7 +1,5 @@
 package components;
 
-import components.Type;
-
 public class Port {
     private static int count = 0;
     private int id;
