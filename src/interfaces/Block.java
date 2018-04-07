@@ -1,15 +1,13 @@
 package interfaces;
 
+import components.Port;
+
 public interface Block {
-    double calculate();
+    boolean execute();
     int getId();
     double[] getCoordinates();
-    int getInPortID(int index);
-    int getOutPortID(int index);
-    void addInPort();
-    void addOutPort();
-    boolean deleteInPort(int index);
-    boolean deleteOutPort(int index);
+    Port getInPort(int index);
+    Port getOutPort(int index);
     //maybe?
     void setCoordinates(double newX, double newY);
     //end maybe?
