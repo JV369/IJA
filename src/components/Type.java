@@ -24,6 +24,10 @@ public class Type {
             case "Food":
                 values.put("calories",1000.0);
                 break;
+            default:
+                this.name = "Human";
+                values.put("weight",80.0);
+                values.put("stamina",100.0);
         }
     }
 

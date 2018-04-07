@@ -31,21 +31,12 @@ public abstract class AbstractBlock implements Block{
         return retVal;
     }
 
-
     public Port getInPort(int index){
         return this.inPort.get(index);
     }
 
     public Port getOutPort(int index){
         return this.outPort.get(index);
-    }
-
-    public int getInPortID(int index){
-        return this.inPort.get(index).getId();
-    }
-
-    public int getOutPortID(int index){
-        return this.outPort.get(index).getId();
     }
 
     public void setCoordinates(double newX, double newY){
