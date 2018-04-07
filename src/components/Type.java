@@ -39,7 +39,7 @@ public class Type {
         if(values.containsKey(property)){
             return values.get(property);
         }
-        return 0.0;
+        return NaN;
     }
 
     public boolean update(String property, double value){
