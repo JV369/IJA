@@ -21,9 +21,9 @@ public class PortTest {
 
     @Test
     public void testPortID() {
-        Assert.assertEquals("Test inkrementace ID",0,port1.getId());
-        Assert.assertEquals("Test inkrementace ID",1,port2.getId());
-        Assert.assertEquals("Test inkrementace ID",2,port3.getId());
+        Assert.assertTrue(port1.getId() != port2.getId());
+        Assert.assertTrue(port1.getId() != port3.getId());
+        Assert.assertTrue(port2.getId() != port3.getId());
     }
 
     @Test
@@ -52,6 +52,6 @@ public class PortTest {
         Assert.assertEquals("Test hodnot portu",30.0,port3.getType().getValue("minutes"),0.001);
 
         Assert.assertFalse(port2.getType().update("minutes",250.0));
-        Assert.assertEquals("Test na špatnou hodnotu",NaN,port3.getType().getValue("calories"));
+        Assert.assertEquals("Test na špatnou hodnotu",NaN,port3.getType().getValue("calories"),0.001);
     }
 }

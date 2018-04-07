@@ -4,6 +4,7 @@ import components.AbstractBlock;
 import components.BlockSleep;
 
 import components.Port;
+import org.junit.Assert;
 import org.junit.Before;
 
 import org.junit.Test;
@@ -30,8 +31,7 @@ public class BlockSleepTest {
     @Test
     public void testInitValues(){
         BlockSleep b2 = new BlockSleep();
-        assertEquals("Test ID 1", 1, block.getId());
-        assertEquals("Test ID 2", 2, b2.getId());
+        Assert.assertTrue(block.getId() != b2.getId());
         assertArrayEquals("Test coordinates", new double[]{0.0, 0.0}, block.getCoordinates(), 0.001);
     }
 
