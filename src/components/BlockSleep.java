@@ -9,13 +9,12 @@ public class BlockSleep extends AbstractBlock {
     }
 
     public void execute(){
-        Type in1 = inPort.get(0).getType();
-        Type in2 = inPort.get(1).getType();
-        Type tmp = outPort.get(0).getType();
+        Type in1 = this.inPort.get(0).getType();
+        Type in2 = this.inPort.get(1).getType();
         double resultStamina = in1.getValue("stamina") + (in2.getValue("hours") + in2.getValue("minutes")/60)*15;
         if(resultStamina > 100.0){
             resultStamina = 100.0;
         }
-        tmp.update("stamina", resultStamina);
+        this.outPort.get(0).getType().update("stamina", resultStamina);
     }
 }

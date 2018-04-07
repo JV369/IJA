@@ -14,7 +14,8 @@ public abstract class AbstractBlock implements Block{
     private double y_coord;
 
     public AbstractBlock(){
-        this.id = (countID++);
+        this.id = countID++;
+
         this.x_coord = 0.0;
         this.y_coord = 0.0;
         this.inPort = new ArrayList<>();

@@ -29,7 +29,7 @@ public class TypeTest {
         Assert.assertEquals("Test nazev typu Something","Human",typeSomething.getName());
 
     }
-
+  
     @Test
     public void testTypeImplicValues() {
         Assert.assertEquals("Test implicitni hodnoty Human",80.0,typeHuman.getValue("weight"),0.001);
@@ -62,5 +62,4 @@ public class TypeTest {
         Assert.assertFalse(typeSomething.update("Something",666));
         Assert.assertEquals("Test na neznámou hodnotu",NaN,typeSomething.getValue("Something"),0.00001);
     }
-
 }
