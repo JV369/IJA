@@ -32,13 +32,25 @@ public class Type {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    public Map<String, Double> getValues() {
-        return values;
+    public double getValue(String property){
+        if(values.containsKey(property)){
+            return values.get(property);
+        }
+        return 0.0;
     }
 
+    public boolean update(String property, double value){
+        if((this.name.equals("Human") || this.name.equals("Time") || this.name.equals("Food")) && this.values.containsKey(property)) {
+            this.values.put(property, value);
+            return true;
+        }
+        return false;
+    }
+
+    /*
     public boolean updateHuman(double weight, double stamina){
         if(this.name.equals("Human")){
             this.values.put("weight",weight);
@@ -64,4 +76,5 @@ public class Type {
         }
         return false;
     }
+    */
 }

@@ -50,6 +50,5 @@ public class TypeTest {
         Assert.assertEquals("Test aktualizované hodnoty Human",50.0,typeHuman.getValues().get("weight"),0.001);
         Assert.assertEquals("Test aktualizované hodnoty Human",25.5,typeHuman.getValues().get("stamina"),0.001);
 
-
     }
 }
