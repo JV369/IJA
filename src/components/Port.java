@@ -5,11 +5,11 @@ import components.Type;
 public class Port {
     private static int count = 0;
     private int id;
-    private Type value;
+    private Type type;
 
-    public Port(){
+    public Port(String type){
         this.id = (count++);
-        this.value = new Type("Real");
+        this.type = new Type(type);
     }
 
     public int getId(){
@@ -17,12 +17,7 @@ public class Port {
     }
 
     public Type getType(){
-        return this.value;
+        return this.type;
     }
 
-    public void setType(Type type){
-        String actType = type.getActiveType();
-        this.value.setActiveType(actType);
-        this.value.setTypeValue(type.getTypeValue(actType));
-    }
 }
