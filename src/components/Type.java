@@ -5,6 +5,10 @@ import java.util.Map;
 
 import static java.lang.Double.NaN;
 
+/**
+ * Třída pro vytvoření a správu typu uloženého v portu
+ * @author Jan Vávra (xvavra20)
+ */
 public class Type {
     private String name;
     private Map<String,Double> values;
