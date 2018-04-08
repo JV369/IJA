@@ -1,3 +1,4 @@
+
 package components;
 
 import components.Port;
@@ -5,6 +6,10 @@ import interfaces.Block;
 
 import java.util.ArrayList;
 
+/**
+ * Abstraktní třída pro jednotlivé bloky
+ * @author Jan Vávra (xvavra20)
+ */
 public abstract class AbstractBlock implements Block{
     private static int countID = 0;
     protected ArrayList<Port> inPort;

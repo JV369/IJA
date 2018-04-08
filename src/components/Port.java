@@ -1,5 +1,9 @@
 package components;
 
+/**
+ * Třída pro vytvoření portu pro block
+ * @author Jan Vávra (xvavra20)
+ */
 public class Port {
     private static int count = 0;
     private int id;
