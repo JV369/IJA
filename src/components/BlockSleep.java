@@ -1,5 +1,9 @@
 package components;
 
+/**
+ * Třída pro simulující činnost "Sleep" typu Human
+ * @author Aleš Postulka (xpostu03)
+ */
 public class BlockSleep extends AbstractBlock {
     public BlockSleep(){
         super();

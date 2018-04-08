@@ -1,5 +1,9 @@
 package components;
 
+/**
+ * Třída pro simulující činnost "Eat" typu Human
+ * @author Aleš Postulka (xpostu03)
+ */
 public class BlockEat extends AbstractBlock{
     public BlockEat(){
         super();
