@@ -32,7 +32,7 @@ public class Type {
                 this.name = "Human";
                 values.put("weight",80.0);
                 values.put("stamina",100.0);
-        }
+        } 
     }
 
     public String getName() {
