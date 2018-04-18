@@ -13,7 +13,10 @@ public class Controller implements Initializable {
 
     @FXML
     private ScrollPane blockMenu;
+    @FXML
     private ScrollPane workSpace;
+
+
     @FXML
     private void handleButtonAction(ActionEvent event) {
         System.out.println("You clicked me!");
@@ -21,7 +24,6 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
     }
 
 }

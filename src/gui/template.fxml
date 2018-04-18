@@ -30,8 +30,8 @@
       </MenuBar>
       <HBox layoutY="29.0" prefHeight="371.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="29.0">
          <children>
-            <ScrollPane prefHeight="200.0" prefWidth="150.0" />
-            <ScrollPane prefHeight="200.0" prefWidth="650.0" HBox.hgrow="ALWAYS" />
+            <ScrollPane fx:id="blockMenu" prefHeight="200.0" prefWidth="150.0" />
+            <ScrollPane fx:id="workSpace" prefHeight="200.0" prefWidth="650.0" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
    </children>
