@@ -1,6 +1,8 @@
 package components;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Observable;
 
 /**
@@ -49,6 +51,12 @@ public class Port extends Observable{
             notifyObservers();
         }
         return true;
+    }
+
+    public void copyValues(Port src){
+        Map inMap = this.getType().getAllValues();
+        inMap.clear();
+        inMap.putAll(src.getType().getAllValues());
     }
 
 }
