@@ -1,5 +1,6 @@
 package components;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class Type {
                 this.name = "Human";
                 values.put("weight",80.0);
                 values.put("stamina",100.0);
-        }
+        } 
     }
 
     public String getName() {
@@ -44,6 +45,14 @@ public class Type {
             return values.get(property);
         }
         return NaN;
+    }
+
+    public Map getAllValues(){
+        return this.values;
+    }
+
+    public void setAllValues(Map values){
+        this.values = values;
     }
 
     public boolean update(String property, double value){

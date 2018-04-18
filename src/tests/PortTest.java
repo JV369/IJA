@@ -14,9 +14,9 @@ public class PortTest {
 
     @Before
     public void setUp() {
-        port1 = new Port("Human");
-        port2 = new Port("Food");
-        port3 = new Port("Time");
+        port1 = new Port("Human", "in");
+        port2 = new Port("Food", "in");
+        port3 = new Port("Time", "in");
     }
 
     @Test
