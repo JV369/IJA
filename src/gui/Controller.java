@@ -1,6 +1,7 @@
 package gui;
 
 import components.BlockEat;
+import components.BlockSleep;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -28,8 +29,16 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
-        MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("file:lib/Block.png", 50, 50, true, true));
+        MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("file:lib/BlockEat.png", 125, 93.75, false, true));
+        MenuBlock blockSleep = new MenuBlock(BlockSleep.class, new Image("file:lib/BlockSleep.png", 125, 93.75, false, true));
+        MenuBlock blockWork = new MenuBlock(BlockEat.class, new Image("file:lib/BlockWork.png", 125, 93.75, false, true));
+        MenuBlock blockCook = new MenuBlock(BlockSleep.class, new Image("file:lib/BlockCook.png", 125, 93.75, false, true));
+        MenuBlock blockSport = new MenuBlock(BlockSleep.class, new Image("file:lib/BlockSport.png", 125, 93.75, false, true));
         this.blockMenu.getChildren().add(blockEat);
+        this.blockMenu.getChildren().add(blockSleep);
+        this.blockMenu.getChildren().add(blockWork);
+        this.blockMenu.getChildren().add(blockCook);
+        this.blockMenu.getChildren().add(blockSport);
     }
 
 }
