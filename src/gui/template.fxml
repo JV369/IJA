@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.Controller">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -30,9 +30,9 @@
       </MenuBar>
    </top>
    <left>
-      <ScrollPane fx:id="BlockMenuPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <ScrollPane fx:id="blockMenuPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="150.0" BorderPane.alignment="CENTER">
          <content>
-            <VBox fx:id="BlockMenu" prefHeight="569.0" prefWidth="200.0" />
+            <VBox fx:id="blockMenu" alignment="TOP_CENTER" prefHeight="569.0" prefWidth="150.0" />
          </content>
       </ScrollPane>
    </left>
