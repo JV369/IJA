@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -12,9 +13,9 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
 
     @FXML
-    private ScrollPane blockMenu;
+    private ScrollPane BlockMenuPane;
     @FXML
-    private ScrollPane workSpace;
+    private VBox BlockMenu;
 
 
     @FXML
