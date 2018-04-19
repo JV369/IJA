@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import sun.security.util.ManifestEntryVerifier;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,9 +20,12 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
 
-    private boolean onScene = false;
     private MenuBlock selectedBlock = null;
     private boolean selected;
+
+    private double orgSceneX, orgSceneY;
+    private double orgTranslateX, orgTranslateY;
+
     @FXML
     private ScrollPane blockMenuPane;
 
@@ -40,6 +44,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
+
         MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("file:lib/BlockEat.png", 125, 93.75, false, true));
         MenuBlock blockSleep = new MenuBlock(BlockSleep.class, new Image("file:lib/BlockSleep.png", 125, 93.75, false, true));
         MenuBlock blockWork = new MenuBlock(BlockWork.class, new Image("file:lib/BlockWork.png", 125, 93.75, false, true));
@@ -96,32 +101,6 @@ public class Controller implements Initializable {
             }
         });
 
-        /*
-        blockScene.setOnDragEntered(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent dragEvent) {
-                onScene = true;
-                System.out.println("huehuehueheu");
-            }
-        });
-
-        blockScene.setOnDragExited(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent dragEvent) {
-                onScene = false;
-                System.out.println("tfuj");
-            }
-        });
-
-        blockScene.setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent dragEvent) {
-                onScene = false;
-                System.out.println("dropped");
-            }
-        });
-
-        */
     }
 
     private void handleMenuClick(MenuBlock block){
@@ -164,7 +143,40 @@ public class Controller implements Initializable {
             MenuBlock block = new MenuBlock(selectedBlock.getAbstractBlockClass(), new Image(url, 125, 93.75, false, true));
             block.setX(event.getX() - 125.0/2.0);
             block.setY(event.getY() - 93.75/2.0);
+
+            block.setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    orgSceneX = event.getSceneX();
+                    orgSceneY = event.getSceneY();
+                    orgTranslateX = ((MenuBlock)(event.getSource())).getTranslateX();
+                    orgTranslateY = ((MenuBlock)(event.getSource())).getTranslateY();
+                }
+            });
+
+            block.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    double offsetX = event.getSceneX() - orgSceneX;
+                    double offsetY = event.getSceneY() - orgSceneY;
+                    double newTranslateX = orgTranslateX + offsetX;
+                    double newTranslateY = orgTranslateY + offsetY;
+
+                    //this wont let you drag it on menu
+                    if((newTranslateX + block.getX()) <= 0){
+                        newTranslateX = -block.getX();
+                    }
+                    if((newTranslateY + block.getY()) <= 0){
+                        newTranslateY = -block.getY();
+                    }
+
+                    ((MenuBlock)(event.getSource())).setTranslateX(newTranslateX);
+                    ((MenuBlock)(event.getSource())).setTranslateY(newTranslateY);
+                }
+            });
+
             blockScene.getChildren().add(block);
+
         }
 
     }
