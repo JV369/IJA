@@ -141,8 +141,23 @@ public class Controller implements Initializable {
                     url = "file:lib/BlockCook.png";
             }
             MenuBlock block = new MenuBlock(selectedBlock.getAbstractBlockClass(), new Image(url, 125, 93.75, false, true));
-            block.setX(event.getX() - 125.0/2.0);
-            block.setY(event.getY() - 93.75/2.0);
+            double Xcoord, Ycoord;
+            if((event.getX() - 125.0) <= 0){
+                Xcoord = event.getX();
+            }
+            else {
+                Xcoord = event.getX() - 125.0/2.0;
+            }
+
+            if((event.getY() - 93.75) <= 0){
+                Ycoord = event.getY();
+            }
+            else {
+                Ycoord = event.getY() - 93.75/2.0;
+            }
+
+            block.setX(Xcoord);
+            block.setY(Ycoord);
 
             block.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override
