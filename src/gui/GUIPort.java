@@ -17,30 +17,15 @@ public class GUIPort extends ImageView{
         super(image);
         this.port = port;
 
-        double Xcoord, Ycoord;
-        if((event.getX() - 125.0) <= 0){
-            Xcoord = event.getX();
-        }
-        else {
-            Xcoord = event.getX() - 125.0/2.0;
-        }
-
-        if((event.getY() - 93.75) <= 0){
-            Ycoord = event.getY();
-        }
-        else {
-            Ycoord = event.getY() - 93.75/2.0;
-        }
-
         if(port.getName().equals("out")){
-            this.setX(Xcoord+125-12.5);
-            this.setY(Ycoord+93.75/2.0 - 12.5);
+            this.setLayoutX(125-12.5);
+            this.setLayoutY(93.75/2.0 - 12.5 + offset);
         }
         else if(port.getName().equals("in")){
-            this.setX(Xcoord-12.5);
-            this.setY(Ycoord+93.75/2.0 - 12.5);
+            this.setLayoutX(-12.5);
+            this.setLayoutY(93.75/2.0 - 12.5 + offset);
         }
-        this.setLayoutY(offset);
+        //this.setLayoutY(offset);
         GUIPort port1 = this;
 
         port1.setOnMouseEntered(new EventHandler<MouseEvent>() {

@@ -19,23 +19,6 @@ public class GUIBlock extends ImageView{
 
     public GUIBlock(Class type, MouseEvent event, Image image){
         super(image);
-        double Xcoord, Ycoord;
-        if((event.getX() - 125.0) <= 0){
-            Xcoord = event.getX();
-        }
-        else {
-            Xcoord = event.getX() - 125.0/2.0;
-        }
-
-        if((event.getY() - 93.75) <= 0){
-            Ycoord = event.getY();
-        }
-        else {
-            Ycoord = event.getY() - 93.75/2.0;
-        }
-
-        this.setX(Xcoord);
-        this.setY(Ycoord);
 
         switch (type.getSimpleName()){
             case "BlockCook":

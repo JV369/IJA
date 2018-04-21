@@ -15,6 +15,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
 import javafx.util.Callback;
 
 import java.net.URL;
@@ -26,12 +27,16 @@ public class Controller implements Initializable {
 
     private MenuBlock selectedBlock = null;
     private Port selectedPort;
+    private GUIPort selectetGUIport1;
+    private GUIPort selectetGUIport2;
+    private boolean connecting = false;
     private boolean selected;
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
     private ContextMenu contextMenuPort;
     private ContextMenu contextMenuBlock;
     private Group selectedGroup;
+    private Group selectedGroup1;
 
     @FXML
     private ScrollPane blockMenuPane;
@@ -55,6 +60,7 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb){
 
+        //main menu actions
         menuClose.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -85,7 +91,13 @@ public class Controller implements Initializable {
 
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("world");
+                if (!connecting) {
+                    connecting = true;
+                } else {
+                    GUIConnection line = new GUIConnection(selectedGroup,selectedGroup1,selectetGUIport1,selectetGUIport2);
+                    blockScene.getChildren().add(line);
+                    connecting = false;
+                }
             }
         });
 
@@ -229,9 +241,7 @@ public class Controller implements Initializable {
                 port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                     @Override
                     public void handle(ContextMenuEvent contextMenuEvent) {
-                        contextMenuPort.show(port, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
-                        selectedPort = port.getPort();
-                        contextMenuBlock.hide();
+                        portContext(contextMenuEvent,port,group);
                     }
                 });
                 actOffset += offset*2;
@@ -249,9 +259,7 @@ public class Controller implements Initializable {
                 port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                     @Override
                     public void handle(ContextMenuEvent contextMenuEvent) {
-                        contextMenuPort.show(port, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
-                        selectedPort = port.getPort();
-                        contextMenuBlock.hide();
+                        portContext(contextMenuEvent,port,group);
                     }
                 });
             }
@@ -281,6 +289,8 @@ public class Controller implements Initializable {
                 }
             });
 
+            group.setTranslateX(event.getX() - 125.0/2.0);
+            group.setTranslateY(event.getY() - 93.75/2.0);
             blockScene.getChildren().add(group);
 
         }
@@ -363,5 +373,17 @@ public class Controller implements Initializable {
         return dialog;
     }
 
-
+    private void portContext(ContextMenuEvent event,GUIPort port, Group group){
+        contextMenuPort.show(port, event.getScreenX(),event.getScreenY());
+        selectedPort = port.getPort();
+        if(!connecting) {
+            selectedGroup = group;
+            selectetGUIport1 = port;
+        }
+        else {
+            selectedGroup1 = group;
+            selectetGUIport2 = port;
+        }
+        contextMenuBlock.hide();
+    }
 }
