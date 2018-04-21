@@ -46,6 +46,14 @@ public abstract class AbstractBlock implements Block{
         return this.outPort.get(index);
     }
 
+    public ArrayList<Port> getAllInPorts() {
+        return inPort;
+    }
+
+    public ArrayList<Port> getAllOutPorts() {
+        return outPort;
+    }
+
     public void setCoordinates(double newX, double newY){
         this.x_coord = newX;
         this.y_coord = newY;

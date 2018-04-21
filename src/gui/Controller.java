@@ -6,25 +6,32 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.Group;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import sun.security.util.ManifestEntryVerifier;
+import javafx.util.Callback;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 
 public class Controller implements Initializable {
 
     private MenuBlock selectedBlock = null;
+    private Port selectedPort;
     private boolean selected;
-
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
+    private ContextMenu contextMenuPort;
+    private ContextMenu contextMenuBlock;
+    private Group selectedGroup;
 
     @FXML
     private ScrollPane blockMenuPane;
@@ -35,7 +42,10 @@ public class Controller implements Initializable {
     @FXML
     private AnchorPane blockScene;
 
-
+    @FXML
+    private MenuItem menuClose;
+    @FXML
+    private MenuItem menuNew;
 
     @FXML
     private void handleBlockAction(ActionEvent event) {
@@ -44,6 +54,57 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
+
+        menuClose.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                System.exit(0);
+            }
+        });
+
+        menuNew.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                blockScene.getChildren().clear();
+            }
+        });
+
+        //contextMenu for Port (connection and set value)
+        contextMenuPort = new ContextMenu();
+
+        MenuItem itemChangeVal = new MenuItem("Change value");
+        itemChangeVal.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                createDialog();
+            }
+        });
+        MenuItem itemConnect = new MenuItem("Connect");
+        itemConnect.setOnAction(new EventHandler<ActionEvent>() {
+
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("world");
+            }
+        });
+
+        // Add MenuItem to ContextMenu
+        contextMenuPort.getItems().addAll(itemChangeVal, itemConnect);
+
+        //ContextMenu for deleting block as a whole
+        contextMenuBlock = new ContextMenu();
+
+        MenuItem itemDelBlock = new MenuItem("Delete");
+        itemDelBlock.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                blockScene.getChildren().remove(selectedGroup);
+            }
+        });
+
+        contextMenuBlock.getItems().add(itemDelBlock);
+
 
         MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("file:lib/BlockEat.png", 125, 93.75, false, true));
         MenuBlock blockSleep = new MenuBlock(BlockSleep.class, new Image("file:lib/BlockSleep.png", 125, 93.75, false, true));
@@ -118,6 +179,7 @@ public class Controller implements Initializable {
         }
     }
 
+    //create block on scene
     private void handleSceneClick(MouseEvent event){
         if(selected){
             String url;
@@ -140,60 +202,165 @@ public class Controller implements Initializable {
                 default:
                     url = "file:lib/BlockCook.png";
             }
-            MenuBlock block = new MenuBlock(selectedBlock.getAbstractBlockClass(), new Image(url, 125, 93.75, false, true));
-            double Xcoord, Ycoord;
-            if((event.getX() - 125.0) <= 0){
-                Xcoord = event.getX();
-            }
-            else {
-                Xcoord = event.getX() - 125.0/2.0;
+            Image imageBlock = new Image(url,125, 93.75, false, true);
+            Image imagePort = new Image("file:lib/Port.png",25, 25, true, true);
+
+            Group group = new Group();
+            GUIBlock block = new GUIBlock(selectedBlock.getAbstractBlockClass(),event,imageBlock);
+            block.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                @Override
+                public void handle(ContextMenuEvent contextMenuEvent) {
+                    contextMenuBlock.show(group, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
+                    selectedGroup = group;
+                    contextMenuPort.hide();
+                }
+            });
+            group.getChildren().add(block);
+
+            double offset = 93.75/(block.getBlock().getAllInPorts().size()*2);
+            double actOffset;
+            if (block.getBlock().getAllInPorts().size() == 1)
+                actOffset = 0;
+            else
+                actOffset = -offset;
+            for (Port inPort: block.getBlock().getAllInPorts()) {
+                GUIPort port = new GUIPort(inPort,event,imagePort,actOffset);
+                group.getChildren().add(port);
+                port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                    @Override
+                    public void handle(ContextMenuEvent contextMenuEvent) {
+                        contextMenuPort.show(port, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
+                        selectedPort = port.getPort();
+                        contextMenuBlock.hide();
+                    }
+                });
+                actOffset += offset*2;
             }
 
-            if((event.getY() - 93.75) <= 0){
-                Ycoord = event.getY();
-            }
-            else {
-                Ycoord = event.getY() - 93.75/2.0;
+            offset = 93.75/(block.getBlock().getAllOutPorts().size()*2);
+            if (block.getBlock().getAllOutPorts().size() == 1)
+                actOffset = 0;
+            else
+                actOffset = -offset;
+            for (Port outPort: block.getBlock().getAllOutPorts()) {
+                GUIPort port = new GUIPort(outPort,event,imagePort,actOffset);
+                group.getChildren().add(port);
+                actOffset += offset*2;
+                port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                    @Override
+                    public void handle(ContextMenuEvent contextMenuEvent) {
+                        contextMenuPort.show(port, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
+                        selectedPort = port.getPort();
+                        contextMenuBlock.hide();
+                    }
+                });
             }
 
-            block.setX(Xcoord);
-            block.setY(Ycoord);
-
-            block.setOnMousePressed(new EventHandler<MouseEvent>() {
+            group.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
                     orgSceneX = event.getSceneX();
                     orgSceneY = event.getSceneY();
-                    orgTranslateX = ((MenuBlock)(event.getSource())).getTranslateX();
-                    orgTranslateY = ((MenuBlock)(event.getSource())).getTranslateY();
+                    orgTranslateX = ((Group)(event.getSource())).getTranslateX();
+                    orgTranslateY = ((Group)(event.getSource())).getTranslateY();
                 }
             });
-
-            block.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            group.setOnMouseDragged(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
                     double offsetX = event.getSceneX() - orgSceneX;
                     double offsetY = event.getSceneY() - orgSceneY;
                     double newTranslateX = orgTranslateX + offsetX;
                     double newTranslateY = orgTranslateY + offsetY;
+                    //System.out.println(newTranslateX);
+                    //System.out.println(event.getSceneX());
 
-                    //this wont let you drag it on menu
-                    if((newTranslateX + block.getX()) <= 0){
-                        newTranslateX = -block.getX();
-                    }
-                    if((newTranslateY + block.getY()) <= 0){
-                        newTranslateY = -block.getY();
-                    }
 
-                    ((MenuBlock)(event.getSource())).setTranslateX(newTranslateX);
-                    ((MenuBlock)(event.getSource())).setTranslateY(newTranslateY);
+                    ((Group)(event.getSource())).setTranslateX(newTranslateX);
+                    ((Group)(event.getSource())).setTranslateY(newTranslateY);
                 }
             });
 
-            blockScene.getChildren().add(block);
+            blockScene.getChildren().add(group);
 
         }
 
+    }
+
+    private Dialog createDialog(){
+        Dialog dialog = new Dialog();
+        dialog.setTitle("Change value");
+        dialog.setResizable(true);
+        GridPane grid = new GridPane();
+        TextField text1 = new TextField();
+        TextField text2 = new TextField();
+        Label label1;
+        Label label2;
+
+        switch (selectedPort.getType().getName()){
+            case "Human":
+                label1 = new Label("Weight: ");
+                label2 = new Label("Stamina: ");
+                text1.setText(Double.toString(selectedPort.getType().getValue("weight")));
+                text2.setText(Double.toString(selectedPort.getType().getValue("stamina")));
+
+                grid.add(label1, 1, 1);
+                grid.add(text1, 2, 1);
+                grid.add(label2, 1, 2);
+                grid.add(text2, 2, 2);
+                break;
+            case "Time":
+                label1 = new Label("Hours: ");
+                label2 = new Label("Minutes: ");
+                text1.setText(Double.toString(selectedPort.getType().getValue("hours")));
+                text2.setText(Double.toString(selectedPort.getType().getValue("minutes")));
+
+                grid.add(label1, 1, 1);
+                grid.add(text1, 2, 1);
+                grid.add(label2, 1, 2);
+                grid.add(text2, 2, 2);
+                break;
+            case "Food":
+                label1 = new Label("Calories: ");
+                text1.setText(Double.toString(selectedPort.getType().getValue("calories")));
+
+                grid.add(label1, 1, 1);
+                grid.add(text1, 2, 1);
+                break;
+
+        }
+
+        dialog.getDialogPane().setContent(grid);
+        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+
+        dialog.setResultConverter(new Callback<ButtonType, double[]>() {
+             @Override
+             public double[] call(ButtonType b) {
+
+                 if (b == buttonTypeOk) {
+                      double []arr = {Double.parseDouble(text1.getText()),Double.parseDouble(text2.getText())};
+                      return arr;
+                 }
+
+                return null;
+            }
+        });
+
+        Optional<double[]> result = dialog.showAndWait();
+        if (result.isPresent()){
+             switch (selectedPort.getType().getName()){
+                 case "Human":
+                     selectedPort.getType().update("weight",result.get()[0]);
+                     selectedPort.getType().update("stamina",result.get()[1]);
+                 case "Time":
+                     selectedPort.getType().update("hours",result.get()[0]);
+                     selectedPort.getType().update("minutes",result.get()[1]);
+                 case "Food":
+                     selectedPort.getType().update("calories",result.get()[0]);
+             }
+        }
+        return dialog;
     }
 
 
