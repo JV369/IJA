@@ -27,6 +27,7 @@ public class Controller implements Initializable {
 
     private MenuBlock selectedBlock = null;
     private Port selectedPort;
+    private GUIConnection selectedConnect;
     private GUIPort selectetGUIport1;
     private GUIPort selectetGUIport2;
     private boolean connecting = false;
@@ -35,6 +36,7 @@ public class Controller implements Initializable {
     private double orgTranslateX, orgTranslateY;
     private ContextMenu contextMenuPort;
     private ContextMenu contextMenuBlock;
+    private ContextMenu contextMenuConnect;
     private Group selectedGroup;
     private Group selectedGroup1;
 
@@ -59,6 +61,19 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
+
+        //ContextMenu for deleting block as a whole
+        contextMenuConnect = new ContextMenu();
+
+        MenuItem itemDelConnect = new MenuItem("Delete");
+        itemDelConnect.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                blockScene.getChildren().remove(selectedConnect);
+            }
+        });
+
+        contextMenuConnect.getItems().add(itemDelConnect);
 
         //main menu actions
         menuClose.setOnAction(new EventHandler<ActionEvent>() {
@@ -95,6 +110,13 @@ public class Controller implements Initializable {
                     connecting = true;
                 } else {
                     GUIConnection line = new GUIConnection(selectedGroup,selectedGroup1,selectetGUIport1,selectetGUIport2);
+                    line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                        @Override
+                        public void handle(ContextMenuEvent event) {
+                            contextMenuConnect.show(line,event.getScreenX(),event.getScreenY());
+                            selectedConnect = line;
+                        }
+                    });
                     blockScene.getChildren().add(line);
                     connecting = false;
                 }
