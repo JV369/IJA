@@ -42,8 +42,8 @@ public class Controller implements Initializable {
     private ContextMenu contextMenuPort;
     private ContextMenu contextMenuBlock;
     private ContextMenu contextMenuConnect;
-    private Group selectedGroup;
     private Group selectedGroup1;
+    private Group selectedGroup2;
     private Scheme scheme;
 
     @FXML
@@ -77,7 +77,7 @@ public class Controller implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 blockScene.getChildren().remove(selectedConnect);
-                scheme.removeConnect(selectedConnect);
+                scheme.getConnections().remove(selectedConnect);
             }
         });
 
@@ -159,36 +159,7 @@ public class Controller implements Initializable {
                 if (!connecting) {
                     connecting = true;
                 } else {
-                    if(!selectetGUIport1.getPort().getType().getName().equals(selectetGUIport2.getPort().getType().getName())) {
-                        displayError("Incompatible types","Can't connect "+ selectetGUIport1.getPort().getType().getName() +
-                                " with " + selectetGUIport2.getPort().getType().getName());
-                    }
-                    else if(selectetGUIport1.getPort().getId() == selectetGUIport2.getPort().getId()){
-                        displayError("Connection to itself","Can't connect port to itself");
-                    }
-                    else if(selectetGUIport1.getPort().getName().equals(selectetGUIport2.getPort().getName())){
-                        displayError("Incompatible ports","Can't connect "+ selectetGUIport1.getPort().getName()+
-                                " and "+ selectetGUIport2.getPort().getName());
-                    }
-                    else {
-                        GUIConnection line;
-                        if(selectetGUIport1.getPort().getName().equals("out"))
-                            line = new GUIConnection(selectedGroup, selectedGroup1, selectetGUIport1, selectetGUIport2);
-                        else
-                            line = new GUIConnection(selectedGroup1,selectedGroup, selectetGUIport2, selectetGUIport1);
-                        scheme.addConnection(line);
-                        line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                            @Override
-                            public void handle(ContextMenuEvent event) {
-                                contextMenuConnect.show(line, event.getScreenX(), event.getScreenY());
-                                selectedConnect = line;
-                            }
-                        });
-                        blockScene.getChildren().add(line);
-                    }
-                    selectetGUIport1 = null;
-                    selectetGUIport2 = null;
-                    connecting = false;
+                    makeConnection();
                 }
             }
         });
@@ -203,22 +174,22 @@ public class Controller implements Initializable {
         itemDelBlock.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                blockScene.getChildren().remove(selectedGroup);
+                blockScene.getChildren().remove(selectedGroup1);
                 for (Port inPort:selectedGUIBlock.getBlock().getAllInPorts()) {
                     GUIConnection possibleConn = scheme.getConnectionByPort(inPort);
                     if(possibleConn != null) {
                         blockScene.getChildren().remove(possibleConn);
-                        scheme.removeConnect(possibleConn);
+                        scheme.getConnections().remove(possibleConn);
                     }
                 }
                 for (Port outPort: selectedGUIBlock.getBlock().getAllOutPorts()) {
                     GUIConnection possibleConn = scheme.getConnectionByPort(outPort);
                     if(possibleConn != null) {
                         blockScene.getChildren().remove(possibleConn);
-                        scheme.removeConnect(possibleConn);
+                        scheme.getConnections().remove(possibleConn);
                     }
                 }
-                scheme.removeAbstractBlock(selectedGUIBlock);
+                scheme.getBlocks().remove(selectedGUIBlock);
             }
         });
 
@@ -346,7 +317,7 @@ public class Controller implements Initializable {
                 @Override
                 public void handle(ContextMenuEvent contextMenuEvent) {
                     contextMenuBlock.show(group, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
-                    selectedGroup = group;
+                    selectedGroup1 = group;
                     selectedGUIBlock = block;
                     contextMenuPort.hide();
                 }
@@ -369,6 +340,16 @@ public class Controller implements Initializable {
                         portContext(contextMenuEvent,port,group);
                     }
                 });
+                port.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if(connecting){
+                            selectedGroup2 = group;
+                            selectetGUIport2 = port;
+                            makeConnection();
+                        }
+                    }
+                });
                 actOffset += offset*2;
             }
 
@@ -386,6 +367,16 @@ public class Controller implements Initializable {
                     @Override
                     public void handle(ContextMenuEvent contextMenuEvent) {
                         portContext(contextMenuEvent,port,group);
+                    }
+                });
+                port.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if(connecting){
+                            selectedGroup2 = group;
+                            selectetGUIport2 = port;
+                            makeConnection();
+                        }
                     }
                 });
             }
@@ -519,11 +510,11 @@ public class Controller implements Initializable {
         contextMenuPort.show(port, event.getScreenX(),event.getScreenY());
         selectedPort = port.getPort();
         if(!connecting) {
-            selectedGroup = group;
+            selectedGroup1 = group;
             selectetGUIport1 = port;
         }
         else {
-            selectedGroup1 = group;
+            selectedGroup2 = group;
             selectetGUIport2 = port;
         }
         contextMenuBlock.hide();
@@ -534,5 +525,43 @@ public class Controller implements Initializable {
         alert.setTitle(title);
         alert.setContentText(messg);
         alert.showAndWait();
+    }
+
+    private void makeConnection(){
+        if(!selectetGUIport1.getPort().getType().getName().equals(selectetGUIport2.getPort().getType().getName())) {
+            displayError("Incompatible types","Can't connect "+ selectetGUIport1.getPort().getType().getName() +
+                    " with " + selectetGUIport2.getPort().getType().getName());
+        }
+        else if(selectetGUIport1.getPort().getId() == selectetGUIport2.getPort().getId()){
+            displayError("Connection to itself","Can't connect port to itself");
+        }
+        else if(selectetGUIport1.getPort().getName().equals(selectetGUIport2.getPort().getName())){
+            displayError("Incompatible ports","Can't connect "+ selectetGUIport1.getPort().getName()+
+                    " and "+ selectetGUIport2.getPort().getName());
+        }
+        else if (scheme.connectionExists(selectetGUIport1.getPort(),selectetGUIport2.getPort())){
+            displayError("Connection exists","Connection already exists");
+        }
+        else {
+            GUIConnection line;
+            if(selectetGUIport1.getPort().getName().equals("out"))
+                line = new GUIConnection(selectedGroup1, selectedGroup2, selectetGUIport1, selectetGUIport2);
+            else
+                line = new GUIConnection(selectedGroup2,selectedGroup1, selectetGUIport2, selectetGUIport1);
+            scheme.addConnection(line);
+            line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                @Override
+                public void handle(ContextMenuEvent event) {
+                    contextMenuConnect.show(line, event.getScreenX(), event.getScreenY());
+                    selectedConnect = line;
+                }
+            });
+            blockScene.getChildren().add(line);
+        }
+        selectedGroup1 = null;
+        selectedGroup2 = null;
+        selectetGUIport1 = null;
+        selectetGUIport2 = null;
+        connecting = false;
     }
 }

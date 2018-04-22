@@ -33,12 +33,12 @@ public class Scheme {
         return false;
     }
 
-    public GUIBlock getAbstractBlock(int index){
-        return this.blocks.get(index);
+    public ArrayList<GUIBlock> getBlocks() {
+        return blocks;
     }
 
-    public GUIConnection getConnection(int index){
-        return this.connections.get(index);
+    public ArrayList<GUIConnection> getConnections() {
+        return connections;
     }
 
     public GUIConnection getConnectionByPort(Port port){
@@ -52,21 +52,18 @@ public class Scheme {
         return null;
     }
 
-    public boolean removeAbstractBlock(GUIBlock block){
-        if(this.blocks.contains(block)){
-            this.blocks.remove(block);
-            return true;
+    public boolean connectionExists(Port port1, Port port2){
+        for (GUIConnection conn: this.connections) {
+            if(conn.getConnect().getIn().getId() == port1.getId() && conn.getConnect().getOut().getId() == port2.getId()){
+                return true;
+            }
+            if(conn.getConnect().getIn().getId() == port2.getId() && conn.getConnect().getOut().getId() == port1.getId()){
+                return true;
+            }
         }
         return false;
     }
 
-    public boolean removeConnect(GUIConnection connection){
-        if(this.connections.contains(connection)){
-            this.connections.remove(connection);
-            return true;
-        }
-        return false;
-    }
 
     public void clearScheme(){
         this.blocks.clear();
