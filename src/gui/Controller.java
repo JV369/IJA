@@ -93,6 +93,7 @@ public class Controller implements Initializable {
         //contextMenu for Port (connection and set value)
         contextMenuPort = new ContextMenu();
 
+        //change value on port
         MenuItem itemChangeVal = new MenuItem("Change value");
         itemChangeVal.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -101,23 +102,48 @@ public class Controller implements Initializable {
                 createDialog();
             }
         });
+        
+        //connection
         MenuItem itemConnect = new MenuItem("Connect");
         itemConnect.setOnAction(new EventHandler<ActionEvent>() {
-
             @Override
             public void handle(ActionEvent event) {
                 if (!connecting) {
                     connecting = true;
                 } else {
-                    GUIConnection line = new GUIConnection(selectedGroup,selectedGroup1,selectetGUIport1,selectetGUIport2);
-                    line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                        @Override
-                        public void handle(ContextMenuEvent event) {
-                            contextMenuConnect.show(line,event.getScreenX(),event.getScreenY());
-                            selectedConnect = line;
-                        }
-                    });
-                    blockScene.getChildren().add(line);
+                    if(!selectetGUIport1.getPort().getType().getName().equals(selectetGUIport2.getPort().getType().getName())) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Incompatible types");
+                        alert.setContentText("Can't connect "+ selectetGUIport1.getPort().getType().getName() +
+                                " with " + selectetGUIport2.getPort().getType().getName());
+                        alert.showAndWait();
+                    }
+                    else if(selectetGUIport1.getPort().getId() == selectetGUIport2.getPort().getId()){
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Connection to itself");
+                        alert.setContentText("Can't connect port to itself");
+                        alert.showAndWait();
+                    }
+                    else if(selectetGUIport1.getPort().getName().equals(selectetGUIport2.getPort().getName())){
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Incompatible ports");
+                        alert.setContentText("Can't connect "+ selectetGUIport1.getPort().getName()+" and "+
+                        selectetGUIport2.getPort().getName());
+                        alert.showAndWait();
+                    }
+                    else {
+                        GUIConnection line = new GUIConnection(selectedGroup, selectedGroup1, selectetGUIport1, selectetGUIport2);
+                        line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                            @Override
+                            public void handle(ContextMenuEvent event) {
+                                contextMenuConnect.show(line, event.getScreenX(), event.getScreenY());
+                                selectedConnect = line;
+                            }
+                        });
+                        blockScene.getChildren().add(line);
+                    }
+                    selectetGUIport1 = null;
+                    selectetGUIport2 = null;
                     connecting = false;
                 }
             }
@@ -199,12 +225,14 @@ public class Controller implements Initializable {
     }
 
     private void handleMenuClick(MenuBlock block){
+        //remove select of block
         if(selected && block.getAbstractBlockClass().equals(selectedBlock.getAbstractBlockClass())) {
             selected = false;
             selectedBlock = null;
             block.setStyle("");
         }
         else {
+            //remember clicked block
             selected = true;
             if(selectedBlock != null)
                 selectedBlock.setStyle("");
@@ -216,6 +244,7 @@ public class Controller implements Initializable {
     //create block on scene
     private void handleSceneClick(MouseEvent event){
         if(selected){
+            //select right image for block
             String url;
             switch (selectedBlock.getAbstractBlockClass().getSimpleName()){
                 case "BlockCook":
@@ -239,6 +268,7 @@ public class Controller implements Initializable {
             Image imageBlock = new Image(url,125, 93.75, false, true);
             Image imagePort = new Image("file:lib/Port.png",25, 25, true, true);
 
+            //group block inports and outports
             Group group = new Group();
             GUIBlock block = new GUIBlock(selectedBlock.getAbstractBlockClass(),event,imageBlock);
             block.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
@@ -251,6 +281,7 @@ public class Controller implements Initializable {
             });
             group.getChildren().add(block);
 
+            //create inports
             double offset = 93.75/(block.getBlock().getAllInPorts().size()*2);
             double actOffset;
             if (block.getBlock().getAllInPorts().size() == 1)
@@ -269,6 +300,7 @@ public class Controller implements Initializable {
                 actOffset += offset*2;
             }
 
+            //create outports
             offset = 93.75/(block.getBlock().getAllOutPorts().size()*2);
             if (block.getBlock().getAllOutPorts().size() == 1)
                 actOffset = 0;
@@ -302,17 +334,27 @@ public class Controller implements Initializable {
                     double offsetY = event.getSceneY() - orgSceneY;
                     double newTranslateX = orgTranslateX + offsetX;
                     double newTranslateY = orgTranslateY + offsetY;
-                    //System.out.println(newTranslateX);
-                    //System.out.println(event.getSceneX());
-
+                    //cant go on menu
+                    if(newTranslateX <= 13){
+                        newTranslateX = 13;
+                    }
+                    if(newTranslateY <= 0){
+                        newTranslateY = 0;
+                    }
 
                     ((Group)(event.getSource())).setTranslateX(newTranslateX);
                     ((Group)(event.getSource())).setTranslateY(newTranslateY);
                 }
             });
-
+            //you cant spawn on menu
             group.setTranslateX(event.getX() - 125.0/2.0);
             group.setTranslateY(event.getY() - 93.75/2.0);
+            if((event.getX() - 125) <= 0){
+                group.setTranslateX(13);
+            }
+            if((event.getY() - 93.75) <= 0){
+                group.setTranslateY(0);
+            }
             blockScene.getChildren().add(group);
 
         }
@@ -321,7 +363,7 @@ public class Controller implements Initializable {
 
     private Dialog createDialog(){
         Dialog dialog = new Dialog();
-        dialog.setTitle("Change value");
+        dialog.setTitle("Change value: "+ selectedPort.getType().getName());
         dialog.setResizable(true);
         GridPane grid = new GridPane();
         TextField text1 = new TextField();

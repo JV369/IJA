@@ -32,4 +32,7 @@ public class Connection implements Observer{
         }
     }
 
+    public Port getOut() {
+        return out;
+    }
 }
