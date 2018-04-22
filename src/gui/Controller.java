@@ -124,14 +124,24 @@ public class Controller implements Initializable {
                         blockScene.getChildren().clear();
                         SerializableData input = new SerializableData();
                         input = (SerializableData) objStream.readObject();
+                        int index = 0;
                         while (!input.className.equals("EOF")){
-
+                            switch (input.className){
+                                case "BlockCook":
+                                case "BlockSleep":
+                                case "BlockEat":
+                                case "BlockWork":
+                                case "BlockSport":
+                                    createBlock(input.className,false,input.value1,input.value2);
+                                default:
+                                    break;
+                            }
                             input = (SerializableData) objStream.readObject();
                         }
 
                     }
                     catch (IOException|ClassNotFoundException i){
-                        displayError("File error","Unable to open file");
+                        displayError("File error","Unable to open file " + i.toString());
                     }
 
                 }
@@ -286,148 +296,155 @@ public class Controller implements Initializable {
                 selectedBlock.setStyle("");
                 doubleClick = false;
             }
-            //select right image for block
-            String url;
-            switch (selectedBlock.getAbstractBlockClass().getSimpleName()){
-                case "BlockCook":
-                    url = "file:lib/BlockCook.png";
-                    break;
-                case "BlockSleep":
-                    url = "file:lib/BlockSleep.png";
-                    break;
-                case "BlockEat":
-                    url = "file:lib/BlockEat.png";
-                    break;
-                case "BlockWork":
-                    url = "file:lib/BlockWork.png";
-                    break;
-                case "BlockSport":
-                    url = "file:lib/BlockSport.png";
-                    break;
-                default:
-                    url = "file:lib/BlockCook.png";
-            }
-            Image imageBlock = new Image(url,125, 93.75, false, true);
-            Image imagePort = new Image("file:lib/Port.png",25, 25, true, true);
-
-            //group block inports and outports
-            Group group = new Group();
-            GUIBlock block = new GUIBlock(selectedBlock.getAbstractBlockClass(),imageBlock);
-            block.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                @Override
-                public void handle(ContextMenuEvent contextMenuEvent) {
-                    contextMenuBlock.show(group, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
-                    selectedGroup1 = group;
-                    selectedGUIBlock = block;
-                    contextMenuPort.hide();
-                }
-            });
-            group.getChildren().add(block);
-
-            //create inports
-            double offset = 93.75/(block.getBlock().getAllInPorts().size()*2);
-            double actOffset;
-            if (block.getBlock().getAllInPorts().size() == 1)
-                actOffset = 0;
-            else
-                actOffset = -offset;
-            for (Port inPort: block.getBlock().getAllInPorts()) {
-                GUIPort port = new GUIPort(inPort,imagePort,actOffset);
-                group.getChildren().add(port);
-                port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                    @Override
-                    public void handle(ContextMenuEvent contextMenuEvent) {
-                        portContext(contextMenuEvent,port,group);
-                    }
-                });
-                port.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if(connecting){
-                            selectedGroup2 = group;
-                            selectetGUIport2 = port;
-                            makeConnection();
-                        }
-                    }
-                });
-                actOffset += offset*2;
-            }
-
-            //create outports
-            offset = 93.75/(block.getBlock().getAllOutPorts().size()*2);
-            if (block.getBlock().getAllOutPorts().size() == 1)
-                actOffset = 0;
-            else
-                actOffset = -offset;
-            for (Port outPort: block.getBlock().getAllOutPorts()) {
-                GUIPort port = new GUIPort(outPort,imagePort,actOffset);
-                group.getChildren().add(port);
-                actOffset += offset*2;
-                port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                    @Override
-                    public void handle(ContextMenuEvent contextMenuEvent) {
-                        portContext(contextMenuEvent,port,group);
-                    }
-                });
-                port.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if(connecting){
-                            selectedGroup2 = group;
-                            selectetGUIport2 = port;
-                            makeConnection();
-                        }
-                    }
-                });
-            }
-
-            group.setOnMousePressed(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    orgSceneX = event.getSceneX();
-                    orgSceneY = event.getSceneY();
-                    orgTranslateX = ((Group)(event.getSource())).getTranslateX();
-                    orgTranslateY = ((Group)(event.getSource())).getTranslateY();
-                }
-            });
-            group.setOnMouseDragged(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    double offsetX = event.getSceneX() - orgSceneX;
-                    double offsetY = event.getSceneY() - orgSceneY;
-                    double newTranslateX = orgTranslateX + offsetX;
-                    double newTranslateY = orgTranslateY + offsetY;
-                    //cant go on menu
-                    if(newTranslateX <= 13){
-                        newTranslateX = 13;
-                    }
-                    if(newTranslateY <= 0){
-                        newTranslateY = 0;
-                    }
-
-                    ((Group)(event.getSource())).setTranslateX(newTranslateX);
-                    ((Group)(event.getSource())).setTranslateY(newTranslateY);
-                    block.getBlock().setCoordinates(newTranslateX,newTranslateY);
-                }
-            });
-            //you cant spawn on menu
-            group.setTranslateX(event.getX() - 125.0/2.0);
-            group.setTranslateY(event.getY() - 93.75/2.0);
-            if((event.getX() - 125) <= 0){
-                group.setTranslateX(13);
-            }
-            if((event.getY() - 93.75) <= 0){
-                group.setTranslateY(0);
-            }
-            block.getBlock().setCoordinates(group.getTranslateX(),group.getTranslateY());
-            scheme.addBlock(block);
-            blockScene.getChildren().add(group);
+            createBlock(selectedBlock.getAbstractBlockClass().getSimpleName(),true,event.getX(),event.getY());
             if(!doubleClick)
                 selectedBlock = null;
         }
 
     }
+    private void createBlock(String type,boolean fromMenu,double x, double y){
+        String url;
+        switch (type){
+            case "BlockCook":
+                url = "file:lib/BlockCook.png";
+                break;
+            case "BlockSleep":
+                url = "file:lib/BlockSleep.png";
+                break;
+            case "BlockEat":
+                url = "file:lib/BlockEat.png";
+                break;
+            case "BlockWork":
+                url = "file:lib/BlockWork.png";
+                break;
+            case "BlockSport":
+                url = "file:lib/BlockSport.png";
+                break;
+            default:
+                url = "file:lib/BlockCook.png";
+        }
+        Image imageBlock = new Image(url,125, 93.75, false, true);
+        Image imagePort = new Image("file:lib/Port.png",25, 25, true, true);
 
+        //group block inports and outports
+        Group group = new Group();
+        GUIBlock block = new GUIBlock(type,imageBlock);
+        block.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+            @Override
+            public void handle(ContextMenuEvent contextMenuEvent) {
+                contextMenuBlock.show(group, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
+                selectedGroup1 = group;
+                selectedGUIBlock = block;
+                contextMenuPort.hide();
+            }
+        });
+        group.getChildren().add(block);
+
+        //create inports
+        double offset = 93.75/(block.getBlock().getAllInPorts().size()*2);
+        double actOffset;
+        if (block.getBlock().getAllInPorts().size() == 1)
+            actOffset = 0;
+        else
+            actOffset = -offset;
+        for (Port inPort: block.getBlock().getAllInPorts()) {
+            GUIPort port = new GUIPort(inPort,imagePort,actOffset);
+            group.getChildren().add(port);
+            port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                @Override
+                public void handle(ContextMenuEvent contextMenuEvent) {
+                    portContext(contextMenuEvent,port,group);
+                }
+            });
+            port.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    if(connecting){
+                        selectedGroup2 = group;
+                        selectetGUIport2 = port;
+                        makeConnection();
+                    }
+                }
+            });
+            actOffset += offset*2;
+        }
+
+        //create outports
+        offset = 93.75/(block.getBlock().getAllOutPorts().size()*2);
+        if (block.getBlock().getAllOutPorts().size() == 1)
+            actOffset = 0;
+        else
+            actOffset = -offset;
+        for (Port outPort: block.getBlock().getAllOutPorts()) {
+            GUIPort port = new GUIPort(outPort,imagePort,actOffset);
+            group.getChildren().add(port);
+            actOffset += offset*2;
+            port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+                @Override
+                public void handle(ContextMenuEvent contextMenuEvent) {
+                    portContext(contextMenuEvent,port,group);
+                }
+            });
+            port.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    if(connecting){
+                        selectedGroup2 = group;
+                        selectetGUIport2 = port;
+                        makeConnection();
+                    }
+                }
+            });
+        }
+
+        group.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                orgSceneX = event.getSceneX();
+                orgSceneY = event.getSceneY();
+                orgTranslateX = ((Group)(event.getSource())).getTranslateX();
+                orgTranslateY = ((Group)(event.getSource())).getTranslateY();
+            }
+        });
+        group.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                double offsetX = event.getSceneX() - orgSceneX;
+                double offsetY = event.getSceneY() - orgSceneY;
+                double newTranslateX = orgTranslateX + offsetX;
+                double newTranslateY = orgTranslateY + offsetY;
+                //cant go on menu
+                if(newTranslateX <= 13){
+                    newTranslateX = 13;
+                }
+                if(newTranslateY <= 0){
+                    newTranslateY = 0;
+                }
+
+                ((Group)(event.getSource())).setTranslateX(newTranslateX);
+                ((Group)(event.getSource())).setTranslateY(newTranslateY);
+                block.getBlock().setCoordinates(newTranslateX,newTranslateY);
+            }
+        });
+        //you cant spawn on menu
+        if(fromMenu) {
+            group.setTranslateX(x - 125.0 / 2.0);
+            group.setTranslateY(y - 93.75 / 2.0);
+            if ((x - 125) <= 0) {
+                group.setTranslateX(13);
+            }
+            if ((y - 93.75) <= 0) {
+                group.setTranslateY(0);
+            }
+        }
+        else {
+            group.setTranslateX(x);
+            group.setTranslateY(y);
+        }
+        block.getBlock().setCoordinates(group.getTranslateX(), group.getTranslateY());
+        scheme.addBlock(block);
+        blockScene.getChildren().add(group);
+    }
 
 
     private Dialog createDialog(){
