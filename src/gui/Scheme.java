@@ -1,5 +1,6 @@
 package gui;
 
+import components.AbstractBlock;
 import components.Connection;
 import components.Port;
 import components.SerializableData;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 
 public class Scheme {
     private ArrayList<GUIBlock> blocks;
-    private ArrayList<Connection> connections;
+    private ArrayList<GUIConnection> connections;
 
     public Scheme(){
         this.blocks = new ArrayList<>();
@@ -25,20 +26,44 @@ public class Scheme {
         return false;
     }
 
-    public boolean addConnection(Connection connection){
+    public boolean addConnection(GUIConnection connection){
         if(!this.connections.contains(connection)){
             this.connections.add(connection);
         }
         return false;
     }
 
-    public GUIBlock getAbstractBlock(int index){
-        return this.blocks.get(index);
+    public ArrayList<GUIBlock> getBlocks() {
+        return blocks;
     }
 
-    public Connection getConnection(int index){
-        return this.connections.get(index);
+    public ArrayList<GUIConnection> getConnections() {
+        return connections;
     }
+
+    public GUIConnection getConnectionByPort(Port port){
+        for (GUIConnection conn: this.connections) {
+            if(port.getId() == conn.getConnect().getIn().getId())
+                return conn;
+            if(port.getId() == conn.getConnect().getOut().getId()){
+                return conn;
+            }
+        }
+        return null;
+    }
+
+    public boolean connectionExists(Port port1, Port port2){
+        for (GUIConnection conn: this.connections) {
+            if(conn.getConnect().getIn().getId() == port1.getId() && conn.getConnect().getOut().getId() == port2.getId()){
+                return true;
+            }
+            if(conn.getConnect().getIn().getId() == port2.getId() && conn.getConnect().getOut().getId() == port1.getId()){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void clearScheme(){
         this.blocks.clear();
@@ -85,12 +110,12 @@ public class Scheme {
     }
 
     private int searchConnectTo(Port port){
-        for (Connection conn: this.connections) {
-            if(conn.getIn().getId() == port.getId()){
-                return conn.getOut().getId();
+        for (GUIConnection conn: this.connections) {
+            if(conn.getConnect().getIn().getId() == port.getId()){
+                return conn.getConnect().getOut().getId();
             }
-            else if(conn.getOut().getId() == port.getId()){
-                return conn.getIn().getId();
+            else if(conn.getConnect().getOut().getId() == port.getId()){
+                return conn.getConnect().getIn().getId();
             }
 
         }
