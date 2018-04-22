@@ -35,4 +35,8 @@ public class Connection implements Observer{
     public Port getOut() {
         return out;
     }
+
+    public Port getIn() {
+        return in;
+    }
 }

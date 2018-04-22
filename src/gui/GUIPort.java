@@ -13,7 +13,7 @@ public class GUIPort extends ImageView{
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
 
-    public GUIPort(Port port, javafx.scene.input.MouseEvent event, Image image, double offset){
+    public GUIPort(Port port, Image image, double offset){
         super(image);
         this.port = port;
 
