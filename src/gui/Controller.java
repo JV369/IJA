@@ -33,10 +33,12 @@ public class Controller implements Initializable {
     private GUIConnection selectedConnect;
     private GUIPort selectetGUIport1;
     private GUIPort selectetGUIport2;
+    private GUIBlock selectedGUIBlock;
     private boolean connecting = false;
     private boolean selected;
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
+    private boolean doubleClick;
     private ContextMenu contextMenuPort;
     private ContextMenu contextMenuBlock;
     private ContextMenu contextMenuConnect;
@@ -75,6 +77,7 @@ public class Controller implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 blockScene.getChildren().remove(selectedConnect);
+                scheme.removeConnect(selectedConnect);
             }
         });
 
@@ -173,7 +176,7 @@ public class Controller implements Initializable {
                             line = new GUIConnection(selectedGroup, selectedGroup1, selectetGUIport1, selectetGUIport2);
                         else
                             line = new GUIConnection(selectedGroup1,selectedGroup, selectetGUIport2, selectetGUIport1);
-                        scheme.addConnection(line.getConnect());
+                        scheme.addConnection(line);
                         line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                             @Override
                             public void handle(ContextMenuEvent event) {
@@ -201,6 +204,21 @@ public class Controller implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 blockScene.getChildren().remove(selectedGroup);
+                for (Port inPort:selectedGUIBlock.getBlock().getAllInPorts()) {
+                    GUIConnection possibleConn = scheme.getConnectionByPort(inPort);
+                    if(possibleConn != null) {
+                        blockScene.getChildren().remove(possibleConn);
+                        scheme.removeConnect(possibleConn);
+                    }
+                }
+                for (Port outPort: selectedGUIBlock.getBlock().getAllOutPorts()) {
+                    GUIConnection possibleConn = scheme.getConnectionByPort(outPort);
+                    if(possibleConn != null) {
+                        blockScene.getChildren().remove(possibleConn);
+                        scheme.removeConnect(possibleConn);
+                    }
+                }
+                scheme.removeAbstractBlock(selectedGUIBlock);
             }
         });
 
@@ -268,9 +286,16 @@ public class Controller implements Initializable {
     private void handleMenuClick(MenuBlock block){
         //remove select of block
         if(selected && block.getAbstractBlockClass().equals(selectedBlock.getAbstractBlockClass())) {
-            selected = false;
-            selectedBlock = null;
-            block.setStyle("");
+            if(!doubleClick){
+                block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
+                doubleClick = true;
+            }
+            else {
+                selected = false;
+                selectedBlock = null;
+                block.setStyle("");
+                doubleClick = false;
+            }
         }
         else {
             //remember clicked block
@@ -285,6 +310,11 @@ public class Controller implements Initializable {
     //create block on scene
     private void handleSceneClick(MouseEvent event){
         if(selected){
+            if(!doubleClick){
+                selected = false;
+                selectedBlock.setStyle("");
+                doubleClick = false;
+            }
             //select right image for block
             String url;
             switch (selectedBlock.getAbstractBlockClass().getSimpleName()){
@@ -317,6 +347,7 @@ public class Controller implements Initializable {
                 public void handle(ContextMenuEvent contextMenuEvent) {
                     contextMenuBlock.show(group, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
                     selectedGroup = group;
+                    selectedGUIBlock = block;
                     contextMenuPort.hide();
                 }
             });
@@ -383,11 +414,9 @@ public class Controller implements Initializable {
                         newTranslateY = 0;
                     }
 
-
                     ((Group)(event.getSource())).setTranslateX(newTranslateX);
                     ((Group)(event.getSource())).setTranslateY(newTranslateY);
                     block.getBlock().setCoordinates(newTranslateX,newTranslateY);
-                    System.out.println(block.getBlock().getClass().getSimpleName());
                 }
             });
             //you cant spawn on menu
@@ -402,7 +431,8 @@ public class Controller implements Initializable {
             block.getBlock().setCoordinates(group.getTranslateX(),group.getTranslateY());
             scheme.addBlock(block);
             blockScene.getChildren().add(group);
-
+            if(!doubleClick)
+                selectedBlock = null;
         }
 
     }
