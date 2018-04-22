@@ -17,7 +17,7 @@ public class GUIBlock extends ImageView{
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
 
-    public GUIBlock(Class type, MouseEvent event, Image image){
+    public GUIBlock(Class type, Image image){
         super(image);
 
         switch (type.getSimpleName()){

@@ -16,8 +16,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.*;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -39,6 +42,7 @@ public class Controller implements Initializable {
     private ContextMenu contextMenuConnect;
     private Group selectedGroup;
     private Group selectedGroup1;
+    private Scheme scheme;
 
     @FXML
     private ScrollPane blockMenuPane;
@@ -53,15 +57,16 @@ public class Controller implements Initializable {
     private MenuItem menuClose;
     @FXML
     private MenuItem menuNew;
-
     @FXML
-    private void handleBlockAction(ActionEvent event) {
-        System.out.println("You clicked me!");
-    }
+    private MenuItem menuSave;
+    @FXML
+    private MenuItem menuOpen;
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb){
-
+        //class for storing all block and connections
+        scheme = new Scheme();
         //ContextMenu for deleting block as a whole
         contextMenuConnect = new ContextMenu();
 
@@ -87,6 +92,46 @@ public class Controller implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 blockScene.getChildren().clear();
+                scheme.clearScheme();
+            }
+        });
+
+        menuSave.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save file");
+                File file = fileChooser.showSaveDialog(new Stage());
+                if(!scheme.saveFile(file))
+                    displayError("File error","Unable to save file");
+            }
+        });
+
+        menuOpen.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Open file");
+                File file = fileChooser.showOpenDialog(new Stage());
+                if(file != null){
+                    try {
+                        FileInputStream stream = new FileInputStream(file);
+                        ObjectInputStream objStream = new ObjectInputStream(stream);
+                        scheme.clearScheme();
+                        blockScene.getChildren().clear();
+                        SerializableData input = new SerializableData();
+                        input = (SerializableData) objStream.readObject();
+                        while (!input.className.equals("EOF")){
+
+                            input = (SerializableData) objStream.readObject();
+                        }
+
+                    }
+                    catch (IOException|ClassNotFoundException i){
+                        displayError("File error","Unable to open file");
+                    }
+
+                }
             }
         });
 
@@ -102,7 +147,7 @@ public class Controller implements Initializable {
                 createDialog();
             }
         });
-        
+
         //connection
         MenuItem itemConnect = new MenuItem("Connect");
         itemConnect.setOnAction(new EventHandler<ActionEvent>() {
@@ -112,27 +157,23 @@ public class Controller implements Initializable {
                     connecting = true;
                 } else {
                     if(!selectetGUIport1.getPort().getType().getName().equals(selectetGUIport2.getPort().getType().getName())) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Incompatible types");
-                        alert.setContentText("Can't connect "+ selectetGUIport1.getPort().getType().getName() +
+                        displayError("Incompatible types","Can't connect "+ selectetGUIport1.getPort().getType().getName() +
                                 " with " + selectetGUIport2.getPort().getType().getName());
-                        alert.showAndWait();
                     }
                     else if(selectetGUIport1.getPort().getId() == selectetGUIport2.getPort().getId()){
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Connection to itself");
-                        alert.setContentText("Can't connect port to itself");
-                        alert.showAndWait();
+                        displayError("Connection to itself","Can't connect port to itself");
                     }
                     else if(selectetGUIport1.getPort().getName().equals(selectetGUIport2.getPort().getName())){
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Incompatible ports");
-                        alert.setContentText("Can't connect "+ selectetGUIport1.getPort().getName()+" and "+
-                        selectetGUIport2.getPort().getName());
-                        alert.showAndWait();
+                        displayError("Incompatible ports","Can't connect "+ selectetGUIport1.getPort().getName()+
+                                " and "+ selectetGUIport2.getPort().getName());
                     }
                     else {
-                        GUIConnection line = new GUIConnection(selectedGroup, selectedGroup1, selectetGUIport1, selectetGUIport2);
+                        GUIConnection line;
+                        if(selectetGUIport1.getPort().getName().equals("out"))
+                            line = new GUIConnection(selectedGroup, selectedGroup1, selectetGUIport1, selectetGUIport2);
+                        else
+                            line = new GUIConnection(selectedGroup1,selectedGroup, selectetGUIport2, selectetGUIport1);
+                        scheme.addConnection(line.getConnect());
                         line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                             @Override
                             public void handle(ContextMenuEvent event) {
@@ -270,7 +311,7 @@ public class Controller implements Initializable {
 
             //group block inports and outports
             Group group = new Group();
-            GUIBlock block = new GUIBlock(selectedBlock.getAbstractBlockClass(),event,imageBlock);
+            GUIBlock block = new GUIBlock(selectedBlock.getAbstractBlockClass(),imageBlock);
             block.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                 @Override
                 public void handle(ContextMenuEvent contextMenuEvent) {
@@ -289,7 +330,7 @@ public class Controller implements Initializable {
             else
                 actOffset = -offset;
             for (Port inPort: block.getBlock().getAllInPorts()) {
-                GUIPort port = new GUIPort(inPort,event,imagePort,actOffset);
+                GUIPort port = new GUIPort(inPort,imagePort,actOffset);
                 group.getChildren().add(port);
                 port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                     @Override
@@ -307,7 +348,7 @@ public class Controller implements Initializable {
             else
                 actOffset = -offset;
             for (Port outPort: block.getBlock().getAllOutPorts()) {
-                GUIPort port = new GUIPort(outPort,event,imagePort,actOffset);
+                GUIPort port = new GUIPort(outPort,imagePort,actOffset);
                 group.getChildren().add(port);
                 actOffset += offset*2;
                 port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
@@ -342,8 +383,11 @@ public class Controller implements Initializable {
                         newTranslateY = 0;
                     }
 
+
                     ((Group)(event.getSource())).setTranslateX(newTranslateX);
                     ((Group)(event.getSource())).setTranslateY(newTranslateY);
+                    block.getBlock().setCoordinates(newTranslateX,newTranslateY);
+                    System.out.println(block.getBlock().getClass().getSimpleName());
                 }
             });
             //you cant spawn on menu
@@ -355,11 +399,15 @@ public class Controller implements Initializable {
             if((event.getY() - 93.75) <= 0){
                 group.setTranslateY(0);
             }
+            block.getBlock().setCoordinates(group.getTranslateX(),group.getTranslateY());
+            scheme.addBlock(block);
             blockScene.getChildren().add(group);
 
         }
 
     }
+
+
 
     private Dialog createDialog(){
         Dialog dialog = new Dialog();
@@ -449,5 +497,12 @@ public class Controller implements Initializable {
             selectetGUIport2 = port;
         }
         contextMenuBlock.hide();
+    }
+
+    private void displayError(String title,String messg){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(messg);
+        alert.showAndWait();
     }
 }
