@@ -32,7 +32,7 @@
              basedir="${build}">
             <manifest>
                 <attribute name="Main-Class"
-                           value="main.Main"/>
+                           value="gui.Main"/>
             </manifest>
         </jar>
     </target>
