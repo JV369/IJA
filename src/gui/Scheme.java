@@ -83,21 +83,22 @@ public class Scheme {
                 for (Port inPort: block.getBlock().getAllInPorts()) {
                     SerializableData dataPort = new SerializableData();
                     dataPort.convertPort(inPort,searchConnectTo(inPort));
-                    objStream.writeObject(data);
+                    objStream.writeObject(dataPort);
                 }
                 for (Port outPort:block.getBlock().getAllOutPorts()) {
                     SerializableData dataPort = new SerializableData();
                     dataPort.convertPort(outPort,searchConnectTo(outPort));
-                    objStream.writeObject(data);
+                    objStream.writeObject(dataPort);
                 }
-                data.connectedTo = -1;
-                data.className = "EOF";
-                data.type = "EOF";
-                data.value1 = -1.0;
-                data.value2 = -1.0;
-                data.id = -1;
-                objStream.writeObject(data);
             }
+            SerializableData eof = new SerializableData();
+            eof.connectedTo = -1;
+            eof.className = "EOF";
+            eof.type = "EOF";
+            eof.value1 = -1.0;
+            eof.value2 = -1.0;
+            eof.id = -1;
+            objStream.writeObject(eof);
             objStream.close();
             stream.close();
         }

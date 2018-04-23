@@ -34,6 +34,10 @@ public class Port extends Observable{
         return this.name;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public boolean update(String typeName, ArrayList<Double> values){
         if(typeName.equals("Human") && this.type.getName().equals(typeName) && values.size() == 2){
             this.type.update("weight", values.get(0));

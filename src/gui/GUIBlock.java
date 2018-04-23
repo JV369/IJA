@@ -14,13 +14,11 @@ import javafx.scene.input.MouseEvent;
 public class GUIBlock extends ImageView{
 
     private AbstractBlock block;
-    private double orgSceneX, orgSceneY;
-    private double orgTranslateX, orgTranslateY;
 
-    public GUIBlock(Class type, Image image){
+    public GUIBlock(String type, Image image){
         super(image);
 
-        switch (type.getSimpleName()){
+        switch (type){
             case "BlockCook":
                 block = new BlockCook();
                 break;
