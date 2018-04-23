@@ -15,8 +15,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -197,14 +195,33 @@ public class Controller implements Initializable {
         menuRun.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+               /* Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Run");
                 alert.setHeaderText("I am running");
                 alert.setContentText("Shit happens");
-                alert.showAndWait();
-
+                alert.showAndWait();*/
+                boolean connected = false;
+                ArrayList<GUIBlock> endBlocks = new ArrayList<>();
                 for (GUIBlock block:scheme.getBlocks()){
-                    block.getBlock().execute();
+                    connected = false;
+                    for(Port port:block.getBlock().getAllOutPorts()){
+                        if(scheme.getConnectionByPort(port) != null){
+                            connected = true;
+                            break;
+                        }
+                    }
+                    if(!connected){
+                        endBlocks.add(block);
+                    }
+                    //block.getBlock().execute();
+                }
+                System.out.println(endBlocks);
+                for(GUIBlock block : endBlocks){
+                    try {
+                        executeBlocks(block);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -332,6 +349,43 @@ public class Controller implements Initializable {
             }
         });
 
+    }
+
+    private void executeBlocks(GUIBlock block) throws InterruptedException {
+        GUIConnection connection;
+        Port p;
+
+        for (Port port:block.getBlock().getAllInPorts()){
+            connection = scheme.getConnectionByPort(port);
+            if(connection != null) {
+                //connected = true;
+                p = connection.getConnect().getOut();
+
+                boolean found = false;
+                for(GUIBlock tmpBl:scheme.getBlocks()){
+                    for(Port tmpPort:tmpBl.getBlock().getAllOutPorts()){
+                        if(tmpPort.equals(p)){
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(found){
+                        executeBlocks(tmpBl);
+                        break;
+                    }
+                }
+            }
+        }
+        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
+        block.getBlock().execute();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Run");
+        alert.setHeaderText("I am running");
+        alert.setContentText(String.valueOf(block.getBlock().getId()));
+        alert.showAndWait();
+
+        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 15, 0, 0, 0)");
+        //Thread.sleep(2000);
     }
 
     private void handleMenuClick(MenuBlock block){
