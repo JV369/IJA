@@ -9,21 +9,21 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -248,11 +248,11 @@ public class Controller implements Initializable {
         contextMenuBlock.getItems().add(itemDelBlock);
 
 
-        MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("file:lib/BlockEat.png", 125, 93.75, false, true));
-        MenuBlock blockSleep = new MenuBlock(BlockSleep.class, new Image("file:lib/BlockSleep.png", 125, 93.75, false, true));
-        MenuBlock blockWork = new MenuBlock(BlockWork.class, new Image("file:lib/BlockWork.png", 125, 93.75, false, true));
-        MenuBlock blockCook = new MenuBlock(BlockCook.class, new Image("file:lib/BlockCook.png", 125, 93.75, false, true));
-        MenuBlock blockSport = new MenuBlock(BlockSport.class, new Image("file:lib/BlockSport.png", 125, 93.75, false, true));
+        MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("file:lib/images/BlockEat.png", 125, 93.75, false, true));
+        MenuBlock blockSleep = new MenuBlock(BlockSleep.class, new Image("file:lib/images/BlockSleep.png", 125, 93.75, false, true));
+        MenuBlock blockWork = new MenuBlock(BlockWork.class, new Image("file:lib/images/BlockWork.png", 125, 93.75, false, true));
+        MenuBlock blockCook = new MenuBlock(BlockCook.class, new Image("file:lib/images/BlockCook.png", 125, 93.75, false, true));
+        MenuBlock blockSport = new MenuBlock(BlockSport.class, new Image("file:lib/images/BlockSport.png", 125, 93.75, false, true));
 
         this.blockMenu.setSpacing(10);
         this.blockMenu.setPadding(new Insets(10,0,10,0));
@@ -348,25 +348,25 @@ public class Controller implements Initializable {
         String url;
         switch (type){
             case "BlockCook":
-                url = "file:lib/BlockCook.png";
+                url = "file:lib/images/BlockCook.png";
                 break;
             case "BlockSleep":
-                url = "file:lib/BlockSleep.png";
+                url = "file:lib/images/BlockSleep.png";
                 break;
             case "BlockEat":
-                url = "file:lib/BlockEat.png";
+                url = "file:lib/images/BlockEat.png";
                 break;
             case "BlockWork":
-                url = "file:lib/BlockWork.png";
+                url = "file:lib/images/BlockWork.png";
                 break;
             case "BlockSport":
-                url = "file:lib/BlockSport.png";
+                url = "file:lib/images/BlockSport.png";
                 break;
             default:
-                url = "file:lib/BlockCook.png";
+                url = "file:lib/images/BlockCook.png";
         }
         Image imageBlock = new Image(url,125, 93.75, false, true);
-        Image imagePort = new Image("file:lib/Port.png",25, 25, true, true);
+        Image imagePort = new Image("file:lib/images/Port.png",25, 25, true, true);
 
         //group block inports and outports
         Group group = new Group();
