@@ -65,6 +65,8 @@ public class Controller implements Initializable {
     private MenuItem menuSave;
     @FXML
     private MenuItem menuOpen;
+    @FXML
+    private MenuItem menuRun;
 
 
     @Override
@@ -186,6 +188,22 @@ public class Controller implements Initializable {
 
                 }
             }
+        });
+
+        menuRun.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Run");
+                alert.setHeaderText("I am running");
+                alert.setContentText("Shit happens");
+                alert.showAndWait();
+
+                for (GUIBlock block:scheme.getBlocks()){
+                    block.getBlock().execute();
+                }
+            }
+
         });
 
         //contextMenu for Port (connection and set value)

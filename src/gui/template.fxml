@@ -27,7 +27,7 @@
           </Menu>
             <Menu mnemonicParsing="false" text="Scheme">
               <items>
-                <MenuItem mnemonicParsing="false" text="Run" />
+                <MenuItem fx:id="menuRun" mnemonicParsing="false" text="Run" />
                   <MenuItem mnemonicParsing="false" text="Step-by-Step Run" />
               </items>
             </Menu>
