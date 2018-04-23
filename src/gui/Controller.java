@@ -22,6 +22,8 @@ import javafx.util.Callback;
 
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -104,9 +106,9 @@ public class Controller implements Initializable {
             public void handle(ActionEvent actionEvent) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Save file");
+                fileChooser.setInitialFileName("simulation.ser");
                 File file = fileChooser.showSaveDialog(new Stage());
-                if(!scheme.saveFile(file))
-                    displayError("File error","Unable to save file");
+                scheme.saveFile(file);
             }
         });
 
@@ -122,9 +124,10 @@ public class Controller implements Initializable {
                         ObjectInputStream objStream = new ObjectInputStream(stream);
                         scheme.clearScheme();
                         blockScene.getChildren().clear();
-                        SerializableData input = new SerializableData();
+                        SerializableData input;
                         input = (SerializableData) objStream.readObject();
                         int index = 0;
+                        ArrayList<Group> groups = new ArrayList<>();
                         while (!input.className.equals("EOF")){
                             switch (input.className){
                                 case "BlockCook":
@@ -132,7 +135,44 @@ public class Controller implements Initializable {
                                 case "BlockEat":
                                 case "BlockWork":
                                 case "BlockSport":
+                                    index = 0;
                                     createBlock(input.className,false,input.value1,input.value2);
+                                    index++;
+                                    break;
+                                case "in":
+                                case "out":
+                                    GUIPort port = (GUIPort) selectedGroup1.getChildren().get(index);
+                                    port.getPort().setId(input.id);
+                                    switch (input.type){
+                                        case "Human":
+                                            port.getPort().getType().update("weight",input.value1);
+                                            port.getPort().getType().update("stamina",input.value2);
+                                            break;
+                                        case "Time":
+                                            port.getPort().getType().update("hours",input.value1);
+                                            port.getPort().getType().update("minutes",input.value2);
+                                            break;
+                                        case "Food":
+                                            port.getPort().getType().update("weight",input.value1);
+                                            break;
+                                    }
+                                    if(input.connectedTo != -1){
+                                        for (Group group:groups) {
+                                            for (int j = 1; j < 4; j++) {
+                                                GUIPort tempPort = (GUIPort)group.getChildren().get(j);
+                                                if(tempPort.getPort().getId() == input.connectedTo && !scheme.connectionExists(port.getPort(),tempPort.getPort())){
+                                                    selectedGroup2 = group;
+                                                    selectetGUIport1 = port;
+                                                    selectetGUIport2 = tempPort;
+                                                    makeConnection();
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        groups.add(selectedGroup1);
+                                    }
+                                    index++;
+                                    break;
                                 default:
                                     break;
                             }
@@ -440,6 +480,7 @@ public class Controller implements Initializable {
         else {
             group.setTranslateX(x);
             group.setTranslateY(y);
+            selectedGroup1 = group;
         }
         block.getBlock().setCoordinates(group.getTranslateX(), group.getTranslateY());
         scheme.addBlock(block);
@@ -575,7 +616,6 @@ public class Controller implements Initializable {
             });
             blockScene.getChildren().add(line);
         }
-        selectedGroup1 = null;
         selectedGroup2 = null;
         selectetGUIport1 = null;
         selectetGUIport2 = null;
