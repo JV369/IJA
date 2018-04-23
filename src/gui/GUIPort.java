@@ -3,19 +3,27 @@ package gui;
 import components.Port;
 import javafx.event.EventHandler;
 import javafx.scene.control.Tooltip;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
+import java.awt.*;
 
-public class GUIPort extends ImageView{
+
+public class GUIPort extends Rectangle{
     private Port port;
-    private double orgSceneX, orgSceneY;
-    private double orgTranslateX, orgTranslateY;
+    private boolean changed;
 
-    public GUIPort(Port port, Image image, double offset){
-        super(image);
+    public GUIPort(Port port, double offset){
+        super();
         this.port = port;
+        this.setWidth(25);
+        this.setHeight(25);
+        this.setFill(Color.WHITE);
+        this.setStroke(Color.BLACK);
+        this.setStrokeWidth(2.5);
 
         if(port.getName().equals("out")){
             this.setLayoutX(125-12.5);
@@ -24,6 +32,8 @@ public class GUIPort extends ImageView{
         else if(port.getName().equals("in")){
             this.setLayoutX(-12.5);
             this.setLayoutY(93.75/2.0 - 12.5 + offset);
+            this.changed = false;
+            this.setFill(Color.RED);
         }
         //this.setLayoutY(offset);
         GUIPort port1 = this;
@@ -55,5 +65,9 @@ public class GUIPort extends ImageView{
 
     public Port getPort() {
         return port;
+    }
+
+    public void setChanged(){
+        changed = !changed;
     }
 }

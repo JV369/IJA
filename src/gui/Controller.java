@@ -14,6 +14,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
+
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -158,16 +161,17 @@ public class Controller implements Initializable {
                                             port.getPort().getType().update("weight",input.value1);
                                             break;
                                     }
-                                    if(input.connectedTo != -1){
+                                    if(input.connectedTo.size() != 0){
                                         for (Group group:groups) {
                                             for (int j = 1; j < 4; j++) {
-                                                GUIPort tempPort = (GUIPort)group.getChildren().get(j);
-                                                if(tempPort.getPort().getId() == input.connectedTo && !scheme.connectionExists(port.getPort(),tempPort.getPort())){
-                                                    selectedGroup2 = group;
-                                                    selectetGUIport1 = port;
-                                                    selectetGUIport2 = tempPort;
-                                                    makeConnection();
-                                                    break;
+                                                for (int connected: input.connectedTo) {
+                                                    GUIPort tempPort = (GUIPort)group.getChildren().get(j);
+                                                    if(tempPort.getPort().getId() == connected && !scheme.connectionExists(port.getPort(),tempPort.getPort())) {
+                                                        selectedGroup2 = group;
+                                                        selectetGUIport1 = port;
+                                                        selectetGUIport2 = tempPort;
+                                                        makeConnection();
+                                                    }
                                                 }
                                             }
                                         }
@@ -246,6 +250,7 @@ public class Controller implements Initializable {
                 for (Port inPort:selectedGUIBlock.getBlock().getAllInPorts()) {
                     GUIConnection possibleConn = scheme.getConnectionByPort(inPort);
                     while (possibleConn != null) {
+
                         blockScene.getChildren().remove(possibleConn);
                         scheme.getConnections().remove(possibleConn);
                         possibleConn = scheme.getConnectionByPort(inPort);
@@ -256,6 +261,11 @@ public class Controller implements Initializable {
                     while (possibleConn != null) {
                         blockScene.getChildren().remove(possibleConn);
                         scheme.getConnections().remove(possibleConn);
+                        GUIPort connectedPort = findRelated(possibleConn.getConnect().getIn().getId());
+                        if(connectedPort != null) {
+                            connectedPort.setChanged();
+                            connectedPort.setFill(Color.RED);
+                        }
                         possibleConn = scheme.getConnectionByPort(outPort);
                     }
                 }
@@ -408,7 +418,7 @@ public class Controller implements Initializable {
         else
             actOffset = -offset;
         for (Port inPort: block.getBlock().getAllInPorts()) {
-            GUIPort port = new GUIPort(inPort,imagePort,actOffset);
+            GUIPort port = new GUIPort(inPort,actOffset);
             group.getChildren().add(port);
             port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                 @Override
@@ -436,7 +446,7 @@ public class Controller implements Initializable {
         else
             actOffset = -offset;
         for (Port outPort: block.getBlock().getAllOutPorts()) {
-            GUIPort port = new GUIPort(outPort,imagePort,actOffset);
+            GUIPort port = new GUIPort(outPort,actOffset);
             group.getChildren().add(port);
             actOffset += offset*2;
             port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
@@ -573,6 +583,10 @@ public class Controller implements Initializable {
         Optional<ArrayList<Double>> result = dialog.showAndWait();
         if (result.isPresent()){
              selectedPort.update(selectedPort.getType().getName(),result.get());
+             if(selectedPort.getName().equals("in")){
+                 selectetGUIport1.setFill(Color.GREEN);
+                 selectetGUIport1.setChanged();
+             }
         }
         return dialog;
     }
@@ -613,12 +627,24 @@ public class Controller implements Initializable {
         else if (scheme.connectionExists(selectetGUIport1.getPort(),selectetGUIport2.getPort())){
             displayError("Connection exists","Connection already exists");
         }
+        else if(selectetGUIport1.getPort().getName().equals("in") && scheme.getConnectionByPort(selectetGUIport1.getPort()) != null){
+            displayError("Connection exists","Can't connect multiple connections to inPort");
+        }
+        else if(selectetGUIport2.getPort().getName().equals("in") && scheme.getConnectionByPort(selectetGUIport2.getPort()) != null){
+            displayError("Connection exists","Can't connect multiple connections to inPort");
+        }
         else {
             GUIConnection line;
-            if(selectetGUIport1.getPort().getName().equals("out"))
+            if(selectetGUIport1.getPort().getName().equals("out")) {
                 line = new GUIConnection(selectedGroup1, selectedGroup2, selectetGUIport1, selectetGUIport2);
-            else
-                line = new GUIConnection(selectedGroup2,selectedGroup1, selectetGUIport2, selectetGUIport1);
+                selectetGUIport2.setChanged();
+                selectetGUIport2.setFill(Color.GREEN);
+            }
+            else {
+                line = new GUIConnection(selectedGroup2, selectedGroup1, selectetGUIport2, selectetGUIport1);
+                selectetGUIport1.setChanged();
+                selectetGUIport1.setFill(Color.GREEN);
+            }
             scheme.addConnection(line);
             line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
                 @Override
@@ -633,5 +659,20 @@ public class Controller implements Initializable {
         selectetGUIport1 = null;
         selectetGUIport2 = null;
         connecting = false;
+    }
+
+    private GUIPort findRelated(int id){
+        for (int i = 0; i < blockScene.getChildren().size(); i++) {
+            if(blockScene.getChildren().get(i).getClass().getSimpleName().equals("Group")) {
+                Group group = (Group) blockScene.getChildren().get(i);
+                for (int j = 1; j < group.getChildren().size(); j++) {
+                    GUIPort port = (GUIPort) group.getChildren().get(j);
+                    if (port.getPort().getId() == id && port.getPort().getName().equals("in")) {
+                        return port;
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
