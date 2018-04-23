@@ -1,6 +1,7 @@
 package components;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class SerializableData implements Serializable{
     public String className;
@@ -8,7 +9,7 @@ public class SerializableData implements Serializable{
     public double value1;
     public double value2;
     public int id;
-    public int connectedTo;
+    public ArrayList<Integer> connectedTo;
 
     public void convertBlock(AbstractBlock block){
         this.className = block.getClass().getSimpleName();
@@ -16,10 +17,10 @@ public class SerializableData implements Serializable{
         this.value1 = block.getCoordinates()[0];
         this.value2 = block.getCoordinates()[1];
         this.id = block.getId();
-        this.connectedTo = 0;
     }
 
-    public void convertPort(Port port,int connectedId){
+    public void convertPort(Port port,ArrayList<Integer> connectedId){
+        this.connectedTo = new ArrayList<>();
         this.className = port.getName();
         this.type = port.getType().getName();
         switch (type){
@@ -37,7 +38,7 @@ public class SerializableData implements Serializable{
                 break;
         }
         this.id = port.getId();
-        this.connectedTo = connectedId;
+        this.connectedTo.addAll(connectedId);
     }
 
 }

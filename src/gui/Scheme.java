@@ -92,7 +92,6 @@ public class Scheme {
                 }
             }
             SerializableData eof = new SerializableData();
-            eof.connectedTo = -1;
             eof.className = "EOF";
             eof.type = "EOF";
             eof.value1 = -1.0;
@@ -110,16 +109,17 @@ public class Scheme {
         return true;
     }
 
-    private int searchConnectTo(Port port){
+    private ArrayList<Integer> searchConnectTo(Port port){
+        ArrayList<Integer> arr = new ArrayList<>();
         for (GUIConnection conn: this.connections) {
             if(conn.getConnect().getIn().getId() == port.getId()){
-                return conn.getConnect().getOut().getId();
+                arr.add(conn.getConnect().getOut().getId());
             }
             else if(conn.getConnect().getOut().getId() == port.getId()){
-                return conn.getConnect().getIn().getId();
+                arr.add(conn.getConnect().getIn().getId());
             }
 
         }
-        return -1;
+        return arr;
     }
 }
