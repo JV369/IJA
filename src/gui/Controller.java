@@ -227,16 +227,18 @@ public class Controller implements Initializable {
                 blockScene.getChildren().remove(selectedGroup1);
                 for (Port inPort:selectedGUIBlock.getBlock().getAllInPorts()) {
                     GUIConnection possibleConn = scheme.getConnectionByPort(inPort);
-                    if(possibleConn != null) {
+                    while (possibleConn != null) {
                         blockScene.getChildren().remove(possibleConn);
                         scheme.getConnections().remove(possibleConn);
+                        possibleConn = scheme.getConnectionByPort(inPort);
                     }
                 }
                 for (Port outPort: selectedGUIBlock.getBlock().getAllOutPorts()) {
                     GUIConnection possibleConn = scheme.getConnectionByPort(outPort);
-                    if(possibleConn != null) {
+                    while (possibleConn != null) {
                         blockScene.getChildren().remove(possibleConn);
                         scheme.getConnections().remove(possibleConn);
+                        possibleConn = scheme.getConnectionByPort(outPort);
                     }
                 }
                 scheme.getBlocks().remove(selectedGUIBlock);
@@ -535,12 +537,14 @@ public class Controller implements Initializable {
         ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
 
-        dialog.setResultConverter(new Callback<ButtonType, double[]>() {
+        dialog.setResultConverter(new Callback<ButtonType, ArrayList<Double>>() {
              @Override
-             public double[] call(ButtonType b) {
+             public ArrayList<Double> call(ButtonType b) {
 
                  if (b == buttonTypeOk) {
-                      double []arr = {Double.parseDouble(text1.getText()),Double.parseDouble(text2.getText())};
+                      ArrayList<Double> arr = new ArrayList<>();
+                      arr.add(Double.parseDouble(text1.getText()));
+                      arr.add(Double.parseDouble(text2.getText()));
                       return arr;
                  }
 
@@ -548,18 +552,9 @@ public class Controller implements Initializable {
             }
         });
 
-        Optional<double[]> result = dialog.showAndWait();
+        Optional<ArrayList<Double>> result = dialog.showAndWait();
         if (result.isPresent()){
-             switch (selectedPort.getType().getName()){
-                 case "Human":
-                     selectedPort.getType().update("weight",result.get()[0]);
-                     selectedPort.getType().update("stamina",result.get()[1]);
-                 case "Time":
-                     selectedPort.getType().update("hours",result.get()[0]);
-                     selectedPort.getType().update("minutes",result.get()[1]);
-                 case "Food":
-                     selectedPort.getType().update("calories",result.get()[0]);
-             }
+             selectedPort.update(selectedPort.getType().getName(),result.get());
         }
         return dialog;
     }
