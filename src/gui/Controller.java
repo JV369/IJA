@@ -51,6 +51,7 @@ public class Controller implements Initializable {
     private Scheme scheme;
 
     private Stack<GUIBlock> blockStack;
+    private ArrayList<GUIBlock> endBlocks;
 
     @FXML
     private ScrollPane blockMenuPane;
@@ -202,34 +203,18 @@ public class Controller implements Initializable {
         menuRun.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //Stack<GUIBlock> blockStack;
-                //boolean connected = false;
-                ArrayList<GUIBlock> endBlocks;// = new ArrayList<>();
-                /*for (GUIBlock block:scheme.getBlocks()){
-                    connected = false;
-                    for(Port port:block.getBlock().getAllOutPorts()){
-                        if(scheme.getConnectionByPort(port) != null){
-                            connected = true;
-                            break;
-                        }
-                    }
-                    if(!connected){
-                        endBlocks.add(block);
-                    }
-                    //block.getBlock().execute();
-                }*/
+                menuNextStep.setDisable(true);
                 endBlocks = scheme.findEndBlocks();
                 System.out.println(endBlocks);
                 for(GUIBlock block : endBlocks){
-                    try {
-                        blockStack = scheme.fillStack(block);
-                        while(!blockStack.empty()) {
+                    blockStack = scheme.fillStack(block);
+                    while(!blockStack.empty()) {
+                        try {
                             scheme.executeBlock(blockStack);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                        //blockStack.push(block);
-                        //scheme.executeBlocks(blockStack);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        blockStack.pop().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
                     }
                 }
             }
@@ -239,37 +224,50 @@ public class Controller implements Initializable {
         menuStepRun.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                //Stack<GUIBlock> blockStack;
-                ArrayList<GUIBlock> endBlocks;
-
                 endBlocks = scheme.findEndBlocks();
                 System.out.println(endBlocks);
 
-                try {
-                    if(endBlocks.size() > 0) {
-                        blockStack = scheme.fillStack(endBlocks.get(0));
-                        if (!blockStack.empty()) {
+                if(!endBlocks.isEmpty()) {
+                    blockStack = scheme.fillStack(endBlocks.get(0));
+                    endBlocks.remove(0);
+                    if (!blockStack.empty()) {
+                        try {
                             scheme.executeBlock(blockStack);
-                            menuNextStep.setDisable(false);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
+                        menuNextStep.setDisable(false);
                     }
-                    //blockStack.push(block);
-                    //scheme.executeBlocks(blockStack);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
+
             }
         });
 
         menuNextStep.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                blockStack.pop().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
                 if(!blockStack.empty()) {
                     try {
                         scheme.executeBlock(blockStack);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }else{
+                    if(!endBlocks.isEmpty()) {
+                        blockStack = scheme.fillStack(endBlocks.get(0));
+                        endBlocks.remove(0);
+                        if (!blockStack.empty()) {
+                            try {
+                                scheme.executeBlock(blockStack);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }else{
+                        menuNextStep.setDisable(true);
+                    }
+
                 }
             }
         });
@@ -623,6 +621,7 @@ public class Controller implements Initializable {
 
                 grid.add(label1, 1, 1);
                 grid.add(text1, 2, 1);
+                text2.setDisable(true);
                 break;
 
         }
@@ -638,7 +637,8 @@ public class Controller implements Initializable {
                  if (b == buttonTypeOk) {
                       ArrayList<Double> arr = new ArrayList<>();
                       arr.add(Double.parseDouble(text1.getText()));
-                      arr.add(Double.parseDouble(text2.getText()));
+                      if(!text2.isDisabled())
+                        arr.add(Double.parseDouble(text2.getText()));
                       return arr;
                  }
 

@@ -22,7 +22,7 @@ public class BlockEat extends AbstractBlock{
         ArrayList<Double> values = new ArrayList<>();
 
 
-        double resultWeight = in2.getType().getValue("calories")/9000 + in1.getType().getValue("weight");
+        double resultWeight = in2.getType().getValue("calories")/3000 + in1.getType().getValue("weight");
         double resultStamina = in2.getType().getValue("calories")/72.36 + in1.getType().getValue("stamina");
         if(resultStamina > 100.0){
             resultStamina = 100.0;

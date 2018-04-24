@@ -2,7 +2,6 @@ package gui;
 
 import components.Port;
 import components.SerializableData;
-import javafx.scene.control.Alert;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -131,6 +130,7 @@ public class Scheme {
         ArrayList<GUIBlock> endBlocks = new ArrayList<>();
         boolean connected;
         for (GUIBlock block:this.getBlocks()){
+            block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(255,255,255,0.8), 15, 0, 0, 0)");
             connected = false;
             for(Port port:block.getBlock().getAllOutPorts()){
                 if(this.getConnectionByPort(port) != null){
@@ -174,17 +174,17 @@ public class Scheme {
             }
         }
 */
-        GUIBlock block = blockStack.pop();
+        GUIBlock block = blockStack.peek();
 
-        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
+        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,200,255,0.8), 15, 0, 0, 0)");
         block.getBlock().execute();
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        /*Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Run");
         alert.setHeaderText("I am running");
         alert.setContentText(String.valueOf(block.getBlock().getId()));
-        alert.showAndWait();
+        alert.showAndWait();*/
 
-        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 15, 0, 0, 0)");
+        //block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 15, 0, 0, 0)");
         //Thread.sleep(2000);
         //return blockStack;
     }
