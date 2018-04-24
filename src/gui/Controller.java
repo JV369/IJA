@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Stack;
 
 
 public class Controller implements Initializable {
@@ -49,6 +50,8 @@ public class Controller implements Initializable {
     private Group selectedGroup2;
     private Scheme scheme;
 
+    private Stack<GUIBlock> blockStack;
+
     @FXML
     private ScrollPane blockMenuPane;
 
@@ -68,6 +71,10 @@ public class Controller implements Initializable {
     private MenuItem menuOpen;
     @FXML
     private MenuItem menuRun;
+    @FXML
+    private MenuItem menuStepRun;
+    @FXML
+    private MenuItem menuNextStep;
 
 
     @Override
@@ -195,14 +202,10 @@ public class Controller implements Initializable {
         menuRun.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-               /* Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Run");
-                alert.setHeaderText("I am running");
-                alert.setContentText("Shit happens");
-                alert.showAndWait();*/
-                boolean connected = false;
-                ArrayList<GUIBlock> endBlocks = new ArrayList<>();
-                for (GUIBlock block:scheme.getBlocks()){
+                //Stack<GUIBlock> blockStack;
+                //boolean connected = false;
+                ArrayList<GUIBlock> endBlocks;// = new ArrayList<>();
+                /*for (GUIBlock block:scheme.getBlocks()){
                     connected = false;
                     for(Port port:block.getBlock().getAllOutPorts()){
                         if(scheme.getConnectionByPort(port) != null){
@@ -214,17 +217,58 @@ public class Controller implements Initializable {
                         endBlocks.add(block);
                     }
                     //block.getBlock().execute();
-                }
+                }*/
+                endBlocks = scheme.findEndBlocks();
                 System.out.println(endBlocks);
                 for(GUIBlock block : endBlocks){
                     try {
-                        executeBlocks(block);
+                        blockStack = scheme.fillStack(block);
+                        while(!blockStack.empty()) {
+                            scheme.executeBlock(blockStack);
+                        }
+                        //blockStack.push(block);
+                        //scheme.executeBlocks(blockStack);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }
 
+        });
+
+        menuStepRun.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                //Stack<GUIBlock> blockStack;
+                ArrayList<GUIBlock> endBlocks;
+
+                endBlocks = scheme.findEndBlocks();
+                System.out.println(endBlocks);
+
+                try {
+                    blockStack = scheme.fillStack(endBlocks.get(0));
+                    if(!blockStack.empty()) {
+                        scheme.executeBlock(blockStack);
+                    }
+                    //blockStack.push(block);
+                    //scheme.executeBlocks(blockStack);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        menuNextStep.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(!blockStack.empty()) {
+                    try {
+                        scheme.executeBlock(blockStack);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         });
 
         //contextMenu for Port (connection and set value)
@@ -351,42 +395,7 @@ public class Controller implements Initializable {
 
     }
 
-    private void executeBlocks(GUIBlock block) throws InterruptedException {
-        GUIConnection connection;
-        Port p;
 
-        for (Port port:block.getBlock().getAllInPorts()){
-            connection = scheme.getConnectionByPort(port);
-            if(connection != null) {
-                //connected = true;
-                p = connection.getConnect().getOut();
-
-                boolean found = false;
-                for(GUIBlock tmpBl:scheme.getBlocks()){
-                    for(Port tmpPort:tmpBl.getBlock().getAllOutPorts()){
-                        if(tmpPort.equals(p)){
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(found){
-                        executeBlocks(tmpBl);
-                        break;
-                    }
-                }
-            }
-        }
-        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
-        block.getBlock().execute();
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Run");
-        alert.setHeaderText("I am running");
-        alert.setContentText(String.valueOf(block.getBlock().getId()));
-        alert.showAndWait();
-
-        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 15, 0, 0, 0)");
-        //Thread.sleep(2000);
-    }
 
     private void handleMenuClick(MenuBlock block){
         //remove select of block

@@ -1,13 +1,16 @@
 package gui;
 
-import components.AbstractBlock;
-import components.Connection;
 import components.Port;
 import components.SerializableData;
-import gui.GUIBlock;
+import javafx.scene.control.Alert;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Stack;
 
 public class Scheme {
     private ArrayList<GUIBlock> blocks;
@@ -121,5 +124,104 @@ public class Scheme {
 
         }
         return arr;
+    }
+
+
+    public  ArrayList<GUIBlock> findEndBlocks(){
+        ArrayList<GUIBlock> endBlocks = new ArrayList<>();
+        boolean connected;
+        for (GUIBlock block:this.getBlocks()){
+            connected = false;
+            for(Port port:block.getBlock().getAllOutPorts()){
+                if(this.getConnectionByPort(port) != null){
+                    connected = true;
+                    break;
+                }
+            }
+            if(!connected){
+                endBlocks.add(block);
+            }
+            //block.getBlock().execute();
+        }
+        return endBlocks;
+    }
+
+    public void executeBlock(Stack<GUIBlock> blockStack) throws InterruptedException {
+        /*GUIConnection connection;
+        Port p;
+
+        //prohledá všechny porty z bloku na vrcholu zásobníku
+        for (Port port:blockStack.peek().getBlock().getAllInPorts()){
+            connection = this.getConnectionByPort(port);
+            if(connection != null) {
+                //connected = true;
+                p = connection.getConnect().getOut();
+
+                boolean found = false;
+                for(GUIBlock tmpBl:blocks){
+                    for(Port tmpPort:tmpBl.getBlock().getAllOutPorts()){
+                        if(tmpPort.equals(p)){
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(found){
+                        blockStack.push(tmpBl);
+                        this.executeBlocks(blockStack);
+                        break;
+                    }
+                }
+            }
+        }
+*/
+        GUIBlock block = blockStack.pop();
+
+        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
+        block.getBlock().execute();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Run");
+        alert.setHeaderText("I am running");
+        alert.setContentText(String.valueOf(block.getBlock().getId()));
+        alert.showAndWait();
+
+        block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 15, 0, 0, 0)");
+        //Thread.sleep(2000);
+        //return blockStack;
+    }
+
+    public Stack<GUIBlock> fillStack(GUIBlock block){
+        Stack<GUIBlock> blockStack = new Stack<>();
+        LinkedList<GUIBlock> blockQueue = new LinkedList<>();
+        GUIConnection connection;
+        Port p;
+
+        blockQueue.addLast(block);
+        while(blockQueue.size() != 0) {
+            //prohledání všech vstupních portů bloku
+            for (Port port : blockQueue.peekFirst().getBlock().getAllInPorts()) {
+                connection = this.getConnectionByPort(port);
+                //pokud je port součástí spojení, je vyhledán blok na druhé straně spojení
+                if (connection != null) {
+                    p = connection.getConnect().getOut();
+
+                    //nalezeni bloku na druhé straně spojení
+                    boolean found = false;
+                    for (GUIBlock tmpBl : blocks) {
+                        for (Port tmpPort : tmpBl.getBlock().getAllOutPorts()) {
+                            if (tmpPort.equals(p)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) {
+                            blockQueue.addLast(tmpBl);
+                            break;
+                        }
+                    }
+                }
+            }
+            blockStack.push(blockQueue.pollFirst());
+        }
+        return blockStack;
     }
 }
