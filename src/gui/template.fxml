@@ -38,7 +38,7 @@
                         <KeyCodeCombination alt="UP" code="R" control="DOWN" meta="UP" shift="DOWN" shortcut="UP" />
                      </accelerator></MenuItem>
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem fx:id="menuNextStep" mnemonicParsing="false" text="Next" />
+                  <MenuItem fx:id="menuNextStep" disable="true" mnemonicParsing="false" text="Next" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">

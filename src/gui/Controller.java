@@ -246,9 +246,12 @@ public class Controller implements Initializable {
                 System.out.println(endBlocks);
 
                 try {
-                    blockStack = scheme.fillStack(endBlocks.get(0));
-                    if(!blockStack.empty()) {
-                        scheme.executeBlock(blockStack);
+                    if(endBlocks.size() > 0) {
+                        blockStack = scheme.fillStack(endBlocks.get(0));
+                        if (!blockStack.empty()) {
+                            scheme.executeBlock(blockStack);
+                            menuNextStep.setDisable(false);
+                        }
                     }
                     //blockStack.push(block);
                     //scheme.executeBlocks(blockStack);
