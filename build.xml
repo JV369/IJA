@@ -18,15 +18,19 @@
         <pathelement location="${build.components}"/>
     </path>
 
-    <target name="compile" description="compile the source" depends="clean">
+    <target name="compile-sources" description="compile the source" depends="clean">
         <mkdir dir="${build.components}"/>
         <mkdir dir="${build.main}"/>
         <javac srcdir="${src}" excludes="tests/*" destdir="${build}" includeantruntime="false"/>
+	<copy todir="${build}" >  
+    	<fileset dir="${src}" includes="**/*.fxml"/>
+	<fileset dir="lib" includes="**/*.png"/>  
+	</copy> 
         <!--<javac srcdir="${src.interfaces}" destdir="${build.interfaces}" includeantruntime="false"/>
         <javac srcdir="${src.components}" destdir="${build.components}" includeantruntime="false"/>
         <javac srcdir="${src.main}" classpath="${build.components}" destdir="${build.main}" includeantruntime="false"/>-->
     </target>
-    <target name="create-jar" depends="compile" description="create .jar archive">
+    <target name="compile" depends="compile-sources" description="create .jar archive">
         <mkdir dir="${dist}"/>
         <jar destfile="${dist}/ija-client.jar"
              basedir="${build}">
@@ -37,7 +41,7 @@
         </jar>
     </target>
 
-    <target name="run" depends="create-jar">
+    <target name="run" depends="compile">
         <java jar="${dist}/ija-client.jar"
               dir="${dist}"
               fork="true"/>
