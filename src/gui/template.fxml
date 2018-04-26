@@ -61,6 +61,6 @@
       </ScrollPane>
    </left>
    <center>
-      <AnchorPane fx:id="blockScene" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+       <AnchorPane fx:id="GUIScheme" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

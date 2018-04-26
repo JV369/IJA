@@ -69,5 +69,13 @@ public class GUIPort extends Rectangle{
 
     public void setChanged(){
         changed = !changed;
+        if(this.changed)
+            this.setFill(Color.GREEN);
+        else
+            this.setFill(Color.RED);
+    }
+
+    public boolean getChanged(){
+        return this.changed;
     }
 }

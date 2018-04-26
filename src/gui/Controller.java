@@ -4,63 +4,37 @@ import components.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.Stack;
 
 
-public class Controller implements Initializable {
+public class Controller extends BorderPane {
 
     private MenuBlock selectedBlock = null;
-    private Port selectedPort;
-    private GUIConnection selectedConnect;
-    private GUIPort selectetGUIport1;
-    private GUIPort selectetGUIport2;
-    private GUIBlock selectedGUIBlock;
-    private boolean connecting = false;
     private boolean selected;
-    private double orgSceneX, orgSceneY;
-    private double orgTranslateX, orgTranslateY;
+
     private boolean doubleClick;
-    private ContextMenu contextMenuPort;
-    private ContextMenu contextMenuBlock;
-    private ContextMenu contextMenuConnect;
-    private Group selectedGroup1;
-    private Group selectedGroup2;
-    private Scheme scheme;
 
     private Stack<GUIBlock> blockStack;
     private ArrayList<GUIBlock> endBlocks;
 
     @FXML
-    private ScrollPane blockMenuPane;
-
-    @FXML
     private VBox blockMenu;
-
-    @FXML
-    private AnchorPane blockScene;
 
     @FXML
     private MenuItem menuClose;
@@ -77,24 +51,15 @@ public class Controller implements Initializable {
     @FXML
     private MenuItem menuNextStep;
 
+    @FXML
+    private AnchorPane GUIScheme;
+    private ControlerScheme controlerScheme;
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb){
-        //class for storing all block and connections
-        scheme = new Scheme();
-        //ContextMenu for deleting block as a whole
-        contextMenuConnect = new ContextMenu();
 
-        MenuItem itemDelConnect = new MenuItem("Delete");
-        itemDelConnect.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                blockScene.getChildren().remove(selectedConnect);
-                scheme.getConnections().remove(selectedConnect);
-            }
-        });
-
-        contextMenuConnect.getItems().add(itemDelConnect);
+    @FXML
+    public void initialize(){
+        controlerScheme = new ControlerScheme();
+        controlerScheme.initialize(GUIScheme);
 
         //main menu actions
         menuClose.setOnAction(new EventHandler<ActionEvent>() {
@@ -107,8 +72,7 @@ public class Controller implements Initializable {
         menuNew.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                blockScene.getChildren().clear();
-                scheme.clearScheme();
+                controlerScheme.clearScene();
             }
         });
 
@@ -119,7 +83,7 @@ public class Controller implements Initializable {
                 fileChooser.setTitle("Save file");
                 fileChooser.setInitialFileName("simulation.ser");
                 File file = fileChooser.showSaveDialog(new Stage());
-                scheme.saveFile(file);
+                controlerScheme.getScheme().saveFile(file);
             }
         });
 
@@ -133,12 +97,12 @@ public class Controller implements Initializable {
                     try {
                         FileInputStream stream = new FileInputStream(file);
                         ObjectInputStream objStream = new ObjectInputStream(stream);
-                        scheme.clearScheme();
-                        blockScene.getChildren().clear();
+                        controlerScheme.clearScene();
                         SerializableData input;
                         input = (SerializableData) objStream.readObject();
                         int index = 0;
                         ArrayList<Group> groups = new ArrayList<>();
+                        Group actGroup = null;
                         while (!input.className.equals("EOF")){
                             switch (input.className){
                                 case "BlockCook":
@@ -147,24 +111,39 @@ public class Controller implements Initializable {
                                 case "BlockWork":
                                 case "BlockSport":
                                     index = 0;
-                                    createBlock(input.className,false,input.value1,input.value2);
+                                    actGroup = controlerScheme.createBlock(input.className,false,input.value1,input.value2);
                                     index++;
                                     break;
                                 case "in":
                                 case "out":
-                                    GUIPort port = (GUIPort) selectedGroup1.getChildren().get(index);
+                                    GUIPort port = (GUIPort) actGroup.getChildren().get(index);
                                     port.getPort().setId(input.id);
                                     switch (input.type){
                                         case "Human":
-                                            port.getPort().getType().update("weight",input.value1);
-                                            port.getPort().getType().update("stamina",input.value2);
+                                            if(!(port.getPort().getType().getValue("weight") == input.value1)) {
+                                                port.getPort().getType().update("weight", input.value1);
+                                                port.setChanged();
+                                            }
+                                            if(!(port.getPort().getType().getValue("stamina") == input.value2)) {
+                                                port.getPort().getType().update("stamina", input.value2);
+                                                port.setChanged();
+                                            }
                                             break;
                                         case "Time":
-                                            port.getPort().getType().update("hours",input.value1);
-                                            port.getPort().getType().update("minutes",input.value2);
+                                            if(!(port.getPort().getType().getValue("hours") == input.value1)) {
+                                                port.getPort().getType().update("hours", input.value1);
+                                                port.setChanged();
+                                            }
+                                            if(!(port.getPort().getType().getValue("minutes") == input.value2)) {
+                                                port.getPort().getType().update("minutes", input.value2);
+                                                port.setChanged();
+                                            }
                                             break;
                                         case "Food":
-                                            port.getPort().getType().update("weight",input.value1);
+                                            if(!(port.getPort().getType().getValue("calories") == input.value1)) {
+                                                port.getPort().getType().update("calories", input.value1);
+                                                port.setChanged();
+                                            }
                                             break;
                                     }
                                     if(input.connectedTo.size() != 0){
@@ -172,16 +151,13 @@ public class Controller implements Initializable {
                                             for (int j = 1; j < 4; j++) {
                                                 for (int connected: input.connectedTo) {
                                                     GUIPort tempPort = (GUIPort)group.getChildren().get(j);
-                                                    if(tempPort.getPort().getId() == connected && !scheme.connectionExists(port.getPort(),tempPort.getPort())) {
-                                                        selectedGroup2 = group;
-                                                        selectetGUIport1 = port;
-                                                        selectetGUIport2 = tempPort;
-                                                        makeConnection();
+                                                    if(tempPort.getPort().getId() == connected && !controlerScheme.getScheme().connectionExists(port.getPort(),tempPort.getPort())) {
+                                                        controlerScheme.makeConnection(actGroup,group,port,tempPort);
                                                     }
                                                 }
                                             }
                                         }
-                                        groups.add(selectedGroup1);
+                                        groups.add(actGroup);
                                     }
                                     index++;
                                     break;
@@ -193,7 +169,7 @@ public class Controller implements Initializable {
 
                     }
                     catch (IOException|ClassNotFoundException i){
-                        displayError("File error","Unable to open file " + i.toString());
+                        controlerScheme.displayError("File error","Unable to open file " + i.toString());
                     }
 
                 }
@@ -204,13 +180,13 @@ public class Controller implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 menuNextStep.setDisable(true);
-                endBlocks = scheme.findEndBlocks();
+                endBlocks = controlerScheme.getScheme().findEndBlocks();
                 //System.out.println(endBlocks);
                 for(GUIBlock block : endBlocks){
-                    blockStack = scheme.fillStack(block);
+                    blockStack = controlerScheme.getScheme().fillStack(block);
                     while(!blockStack.empty()) {
                         try {
-                            scheme.executeBlock(blockStack);
+                            controlerScheme.getScheme().executeBlock(blockStack);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -224,15 +200,15 @@ public class Controller implements Initializable {
         menuStepRun.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                endBlocks = scheme.findEndBlocks();
+                endBlocks = controlerScheme.getScheme().findEndBlocks();
                 //System.out.println(endBlocks);
 
                 if(!endBlocks.isEmpty()) {
-                    blockStack = scheme.fillStack(endBlocks.get(0));
+                    blockStack = controlerScheme.getScheme().fillStack(endBlocks.get(0));
                     endBlocks.remove(0);
                     if (!blockStack.empty()) {
                         try {
-                            scheme.executeBlock(blockStack);
+                            controlerScheme.getScheme().executeBlock(blockStack);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -249,17 +225,17 @@ public class Controller implements Initializable {
                 blockStack.pop().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
                 if(!blockStack.empty()) {
                     try {
-                        scheme.executeBlock(blockStack);
+                        controlerScheme.getScheme().executeBlock(blockStack);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }else{
                     if(!endBlocks.isEmpty()) {
-                        blockStack = scheme.fillStack(endBlocks.get(0));
+                        blockStack = controlerScheme.getScheme().fillStack(endBlocks.get(0));
                         endBlocks.remove(0);
                         if (!blockStack.empty()) {
                             try {
-                                scheme.executeBlock(blockStack);
+                                controlerScheme.getScheme().executeBlock(blockStack);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
@@ -271,71 +247,6 @@ public class Controller implements Initializable {
                 }
             }
         });
-
-        //contextMenu for Port (connection and set value)
-        contextMenuPort = new ContextMenu();
-
-        //change value on port
-        MenuItem itemChangeVal = new MenuItem("Change value");
-        itemChangeVal.setOnAction(new EventHandler<ActionEvent>() {
-
-            @Override
-            public void handle(ActionEvent event) {
-                createDialog();
-            }
-        });
-
-        //connection
-        MenuItem itemConnect = new MenuItem("Connect");
-        itemConnect.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (!connecting) {
-                    connecting = true;
-                } else {
-                    makeConnection();
-                }
-            }
-        });
-
-        // Add MenuItem to ContextMenu
-        contextMenuPort.getItems().addAll(itemChangeVal, itemConnect);
-
-        //ContextMenu for deleting block as a whole
-        contextMenuBlock = new ContextMenu();
-
-        MenuItem itemDelBlock = new MenuItem("Delete");
-        itemDelBlock.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                blockScene.getChildren().remove(selectedGroup1);
-                for (Port inPort:selectedGUIBlock.getBlock().getAllInPorts()) {
-                    GUIConnection possibleConn = scheme.getConnectionByPort(inPort);
-                    while (possibleConn != null) {
-
-                        blockScene.getChildren().remove(possibleConn);
-                        scheme.getConnections().remove(possibleConn);
-                        possibleConn = scheme.getConnectionByPort(inPort);
-                    }
-                }
-                for (Port outPort: selectedGUIBlock.getBlock().getAllOutPorts()) {
-                    GUIConnection possibleConn = scheme.getConnectionByPort(outPort);
-                    while (possibleConn != null) {
-                        blockScene.getChildren().remove(possibleConn);
-                        scheme.getConnections().remove(possibleConn);
-                        GUIPort connectedPort = findRelated(possibleConn.getConnect().getIn().getId());
-                        if(connectedPort != null) {
-                            connectedPort.setChanged();
-                            connectedPort.setFill(Color.RED);
-                        }
-                        possibleConn = scheme.getConnectionByPort(outPort);
-                    }
-                }
-                scheme.getBlocks().remove(selectedGUIBlock);
-            }
-        });
-
-        contextMenuBlock.getItems().add(itemDelBlock);
 
 
         MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("images/BlockEat.png", 125, 93.75, false, true));
@@ -387,12 +298,24 @@ public class Controller implements Initializable {
             }
         });
 
-        blockScene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        GUIScheme.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                handleSceneClick(event);
+                if(selected){
+                    if(!doubleClick){
+                        selected = false;
+                        selectedBlock.setStyle("");
+                        doubleClick = false;
+                    }
+                    controlerScheme.createBlock(
+                             selectedBlock.getAbstractBlockClass().getSimpleName(),true,event.getX(),event.getY()
+                    );
+                    if(!doubleClick)
+                        selectedBlock = null;
+                }
             }
         });
+
 
     }
 
@@ -422,323 +345,5 @@ public class Controller implements Initializable {
         }
     }
 
-    //create block on scene
-    private void handleSceneClick(MouseEvent event){
-        if(selected){
-            if(!doubleClick){
-                selected = false;
-                selectedBlock.setStyle("");
-                doubleClick = false;
-            }
-            createBlock(selectedBlock.getAbstractBlockClass().getSimpleName(),true,event.getX(),event.getY());
-            if(!doubleClick)
-                selectedBlock = null;
-        }
 
-    }
-    private void createBlock(String type,boolean fromMenu,double x, double y){
-        String url;
-        switch (type){
-            case "BlockCook":
-                url = "images/BlockCook.png";
-                break;
-            case "BlockSleep":
-                url = "images/BlockSleep.png";
-                break;
-            case "BlockEat":
-                url = "images/BlockEat.png";
-                break;
-            case "BlockWork":
-                url = "images/BlockWork.png";
-                break;
-            case "BlockSport":
-                url = "images/BlockSport.png";
-                break;
-            default:
-                url = "images/BlockCook.png";
-        }
-        Image imageBlock = new Image(url,125, 93.75, false, true);
-        Image imagePort = new Image("images/Port.png",25, 25, true, true);
-
-        //group block inports and outports
-        Group group = new Group();
-        GUIBlock block = new GUIBlock(type,imageBlock);
-        block.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-            @Override
-            public void handle(ContextMenuEvent contextMenuEvent) {
-                contextMenuBlock.show(group, contextMenuEvent.getScreenX(),contextMenuEvent.getScreenY());
-                selectedGroup1 = group;
-                selectedGUIBlock = block;
-                contextMenuPort.hide();
-            }
-        });
-        group.getChildren().add(block);
-
-        //create inports
-        double offset = 93.75/(block.getBlock().getAllInPorts().size()*2);
-        double actOffset;
-        if (block.getBlock().getAllInPorts().size() == 1)
-            actOffset = 0;
-        else
-            actOffset = -offset;
-        for (Port inPort: block.getBlock().getAllInPorts()) {
-            GUIPort port = new GUIPort(inPort,actOffset);
-            group.getChildren().add(port);
-            port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                @Override
-                public void handle(ContextMenuEvent contextMenuEvent) {
-                    portContext(contextMenuEvent,port,group);
-                }
-            });
-            port.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    if(connecting){
-                        selectedGroup2 = group;
-                        selectetGUIport2 = port;
-                        makeConnection();
-                    }
-                }
-            });
-            actOffset += offset*2;
-        }
-
-        //create outports
-        offset = 93.75/(block.getBlock().getAllOutPorts().size()*2);
-        if (block.getBlock().getAllOutPorts().size() == 1)
-            actOffset = 0;
-        else
-            actOffset = -offset;
-        for (Port outPort: block.getBlock().getAllOutPorts()) {
-            GUIPort port = new GUIPort(outPort,actOffset);
-            group.getChildren().add(port);
-            actOffset += offset*2;
-            port.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                @Override
-                public void handle(ContextMenuEvent contextMenuEvent) {
-                    portContext(contextMenuEvent,port,group);
-                }
-            });
-            port.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    if(connecting){
-                        selectedGroup2 = group;
-                        selectetGUIport2 = port;
-                        makeConnection();
-                    }
-                }
-            });
-        }
-
-        group.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                orgSceneX = event.getSceneX();
-                orgSceneY = event.getSceneY();
-                orgTranslateX = ((Group)(event.getSource())).getTranslateX();
-                orgTranslateY = ((Group)(event.getSource())).getTranslateY();
-            }
-        });
-        group.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                double offsetX = event.getSceneX() - orgSceneX;
-                double offsetY = event.getSceneY() - orgSceneY;
-                double newTranslateX = orgTranslateX + offsetX;
-                double newTranslateY = orgTranslateY + offsetY;
-                //cant go on menu
-                if(newTranslateX <= 13){
-                    newTranslateX = 13;
-                }
-                if(newTranslateY <= 0){
-                    newTranslateY = 0;
-                }
-
-                ((Group)(event.getSource())).setTranslateX(newTranslateX);
-                ((Group)(event.getSource())).setTranslateY(newTranslateY);
-                block.getBlock().setCoordinates(newTranslateX,newTranslateY);
-            }
-        });
-        //you cant spawn on menu
-        if(fromMenu) {
-            group.setTranslateX(x - 125.0 / 2.0);
-            group.setTranslateY(y - 93.75 / 2.0);
-            if ((x - 125) <= 0) {
-                group.setTranslateX(13);
-            }
-            if ((y - 93.75) <= 0) {
-                group.setTranslateY(0);
-            }
-        }
-        else {
-            group.setTranslateX(x);
-            group.setTranslateY(y);
-            selectedGroup1 = group;
-        }
-        block.getBlock().setCoordinates(group.getTranslateX(), group.getTranslateY());
-        scheme.addBlock(block);
-        blockScene.getChildren().add(group);
-    }
-
-
-    private Dialog createDialog(){
-        Dialog dialog = new Dialog();
-        dialog.setTitle("Change value: "+ selectedPort.getType().getName());
-        dialog.setResizable(true);
-        GridPane grid = new GridPane();
-        TextField text1 = new TextField();
-        TextField text2 = new TextField();
-        Label label1;
-        Label label2;
-
-        switch (selectedPort.getType().getName()){
-            case "Human":
-                label1 = new Label("Weight: ");
-                label2 = new Label("Stamina: ");
-                text1.setText(Double.toString(selectedPort.getType().getValue("weight")));
-                text2.setText(Double.toString(selectedPort.getType().getValue("stamina")));
-
-                grid.add(label1, 1, 1);
-                grid.add(text1, 2, 1);
-                grid.add(label2, 1, 2);
-                grid.add(text2, 2, 2);
-                break;
-            case "Time":
-                label1 = new Label("Hours: ");
-                label2 = new Label("Minutes: ");
-                text1.setText(Double.toString(selectedPort.getType().getValue("hours")));
-                text2.setText(Double.toString(selectedPort.getType().getValue("minutes")));
-
-                grid.add(label1, 1, 1);
-                grid.add(text1, 2, 1);
-                grid.add(label2, 1, 2);
-                grid.add(text2, 2, 2);
-                break;
-            case "Food":
-                label1 = new Label("Calories: ");
-                text1.setText(Double.toString(selectedPort.getType().getValue("calories")));
-
-                grid.add(label1, 1, 1);
-                grid.add(text1, 2, 1);
-                text2.setDisable(true);
-                break;
-
-        }
-
-        dialog.getDialogPane().setContent(grid);
-        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
-
-        dialog.setResultConverter(new Callback<ButtonType, ArrayList<Double>>() {
-             @Override
-             public ArrayList<Double> call(ButtonType b) {
-
-                 if (b == buttonTypeOk) {
-                      ArrayList<Double> arr = new ArrayList<>();
-                      arr.add(Double.parseDouble(text1.getText()));
-                      if(!text2.isDisabled())
-                        arr.add(Double.parseDouble(text2.getText()));
-                      return arr;
-                 }
-
-                return null;
-            }
-        });
-
-        Optional<ArrayList<Double>> result = dialog.showAndWait();
-        if (result.isPresent()){
-             selectedPort.update(selectedPort.getType().getName(),result.get());
-             if(selectedPort.getName().equals("in")){
-                 selectetGUIport1.setFill(Color.GREEN);
-                 selectetGUIport1.setChanged();
-             }
-        }
-        return dialog;
-    }
-
-    private void portContext(ContextMenuEvent event,GUIPort port, Group group){
-        contextMenuPort.show(port, event.getScreenX(),event.getScreenY());
-        selectedPort = port.getPort();
-        if(!connecting) {
-            selectedGroup1 = group;
-            selectetGUIport1 = port;
-        }
-        else {
-            selectedGroup2 = group;
-            selectetGUIport2 = port;
-        }
-        contextMenuBlock.hide();
-    }
-
-    private void displayError(String title,String messg){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setContentText(messg);
-        alert.showAndWait();
-    }
-
-    private void makeConnection(){
-        if(!selectetGUIport1.getPort().getType().getName().equals(selectetGUIport2.getPort().getType().getName())) {
-            displayError("Incompatible types","Can't connect "+ selectetGUIport1.getPort().getType().getName() +
-                    " with " + selectetGUIport2.getPort().getType().getName());
-        }
-        else if(selectetGUIport1.getPort().getId() == selectetGUIport2.getPort().getId()){
-            displayError("Connection to itself","Can't connect port to itself");
-        }
-        else if(selectetGUIport1.getPort().getName().equals(selectetGUIport2.getPort().getName())){
-            displayError("Incompatible ports","Can't connect "+ selectetGUIport1.getPort().getName()+
-                    " and "+ selectetGUIport2.getPort().getName());
-        }
-        else if (scheme.connectionExists(selectetGUIport1.getPort(),selectetGUIport2.getPort())){
-            displayError("Connection exists","Connection already exists");
-        }
-        else if(selectetGUIport1.getPort().getName().equals("in") && scheme.getConnectionByPort(selectetGUIport1.getPort()) != null){
-            displayError("Connection exists","Can't connect multiple connections to inPort");
-        }
-        else if(selectetGUIport2.getPort().getName().equals("in") && scheme.getConnectionByPort(selectetGUIport2.getPort()) != null){
-            displayError("Connection exists","Can't connect multiple connections to inPort");
-        }
-        else {
-            GUIConnection line;
-            if(selectetGUIport1.getPort().getName().equals("out")) {
-                line = new GUIConnection(selectedGroup1, selectedGroup2, selectetGUIport1, selectetGUIport2);
-                selectetGUIport2.setChanged();
-                selectetGUIport2.setFill(Color.GREEN);
-            }
-            else {
-                line = new GUIConnection(selectedGroup2, selectedGroup1, selectetGUIport2, selectetGUIport1);
-                selectetGUIport1.setChanged();
-                selectetGUIport1.setFill(Color.GREEN);
-            }
-            scheme.addConnection(line);
-            line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-                @Override
-                public void handle(ContextMenuEvent event) {
-                    contextMenuConnect.show(line, event.getScreenX(), event.getScreenY());
-                    selectedConnect = line;
-                }
-            });
-            blockScene.getChildren().add(line);
-        }
-        selectedGroup2 = null;
-        selectetGUIport1 = null;
-        selectetGUIport2 = null;
-        connecting = false;
-    }
-
-    private GUIPort findRelated(int id){
-        for (int i = 0; i < blockScene.getChildren().size(); i++) {
-            if(blockScene.getChildren().get(i).getClass().getSimpleName().equals("Group")) {
-                Group group = (Group) blockScene.getChildren().get(i);
-                for (int j = 1; j < group.getChildren().size(); j++) {
-                    GUIPort port = (GUIPort) group.getChildren().get(j);
-                    if (port.getPort().getId() == id && port.getPort().getName().equals("in")) {
-                        return port;
-                    }
-                }
-            }
-        }
-        return null;
-    }
 }
