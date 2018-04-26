@@ -15,8 +15,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -29,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Stack;
 
 
 public class Controller implements Initializable {
@@ -51,6 +50,9 @@ public class Controller implements Initializable {
     private Group selectedGroup2;
     private Scheme scheme;
 
+    private Stack<GUIBlock> blockStack;
+    private ArrayList<GUIBlock> endBlocks;
+
     @FXML
     private ScrollPane blockMenuPane;
 
@@ -70,6 +72,10 @@ public class Controller implements Initializable {
     private MenuItem menuOpen;
     @FXML
     private MenuItem menuRun;
+    @FXML
+    private MenuItem menuStepRun;
+    @FXML
+    private MenuItem menuNextStep;
 
 
     @Override
@@ -197,17 +203,73 @@ public class Controller implements Initializable {
         menuRun.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Run");
-                alert.setHeaderText("I am running");
-                alert.setContentText("Shit happens");
-                alert.showAndWait();
-
-                for (GUIBlock block:scheme.getBlocks()){
-                    block.getBlock().execute();
+                menuNextStep.setDisable(true);
+                endBlocks = scheme.findEndBlocks();
+                //System.out.println(endBlocks);
+                for(GUIBlock block : endBlocks){
+                    blockStack = scheme.fillStack(block);
+                    while(!blockStack.empty()) {
+                        try {
+                            scheme.executeBlock(blockStack);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        blockStack.pop().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
+                    }
                 }
             }
 
+        });
+
+        menuStepRun.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                endBlocks = scheme.findEndBlocks();
+                //System.out.println(endBlocks);
+
+                if(!endBlocks.isEmpty()) {
+                    blockStack = scheme.fillStack(endBlocks.get(0));
+                    endBlocks.remove(0);
+                    if (!blockStack.empty()) {
+                        try {
+                            scheme.executeBlock(blockStack);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        menuNextStep.setDisable(false);
+                    }
+                }
+
+            }
+        });
+
+        menuNextStep.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                blockStack.pop().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
+                if(!blockStack.empty()) {
+                    try {
+                        scheme.executeBlock(blockStack);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    if(!endBlocks.isEmpty()) {
+                        blockStack = scheme.fillStack(endBlocks.get(0));
+                        endBlocks.remove(0);
+                        if (!blockStack.empty()) {
+                            try {
+                                scheme.executeBlock(blockStack);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }else{
+                        menuNextStep.setDisable(true);
+                    }
+
+                }
+            }
         });
 
         //contextMenu for Port (connection and set value)
@@ -276,11 +338,11 @@ public class Controller implements Initializable {
         contextMenuBlock.getItems().add(itemDelBlock);
 
 
-        MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("file:lib/images/BlockEat.png", 125, 93.75, false, true));
-        MenuBlock blockSleep = new MenuBlock(BlockSleep.class, new Image("file:lib/images/BlockSleep.png", 125, 93.75, false, true));
-        MenuBlock blockWork = new MenuBlock(BlockWork.class, new Image("file:lib/images/BlockWork.png", 125, 93.75, false, true));
-        MenuBlock blockCook = new MenuBlock(BlockCook.class, new Image("file:lib/images/BlockCook.png", 125, 93.75, false, true));
-        MenuBlock blockSport = new MenuBlock(BlockSport.class, new Image("file:lib/images/BlockSport.png", 125, 93.75, false, true));
+        MenuBlock blockEat = new MenuBlock(BlockEat.class, new Image("images/BlockEat.png", 125, 93.75, false, true));
+        MenuBlock blockSleep = new MenuBlock(BlockSleep.class, new Image("images/BlockSleep.png", 125, 93.75, false, true));
+        MenuBlock blockWork = new MenuBlock(BlockWork.class, new Image("images/BlockWork.png", 125, 93.75, false, true));
+        MenuBlock blockCook = new MenuBlock(BlockCook.class, new Image("images/BlockCook.png", 125, 93.75, false, true));
+        MenuBlock blockSport = new MenuBlock(BlockSport.class, new Image("images/BlockSport.png", 125, 93.75, false, true));
 
         this.blockMenu.setSpacing(10);
         this.blockMenu.setPadding(new Insets(10,0,10,0));
@@ -334,6 +396,8 @@ public class Controller implements Initializable {
 
     }
 
+
+
     private void handleMenuClick(MenuBlock block){
         //remove select of block
         if(selected && block.getAbstractBlockClass().equals(selectedBlock.getAbstractBlockClass())) {
@@ -376,25 +440,25 @@ public class Controller implements Initializable {
         String url;
         switch (type){
             case "BlockCook":
-                url = "file:lib/images/BlockCook.png";
+                url = "images/BlockCook.png";
                 break;
             case "BlockSleep":
-                url = "file:lib/images/BlockSleep.png";
+                url = "images/BlockSleep.png";
                 break;
             case "BlockEat":
-                url = "file:lib/images/BlockEat.png";
+                url = "images/BlockEat.png";
                 break;
             case "BlockWork":
-                url = "file:lib/images/BlockWork.png";
+                url = "images/BlockWork.png";
                 break;
             case "BlockSport":
-                url = "file:lib/images/BlockSport.png";
+                url = "images/BlockSport.png";
                 break;
             default:
-                url = "file:lib/images/BlockCook.png";
+                url = "images/BlockCook.png";
         }
         Image imageBlock = new Image(url,125, 93.75, false, true);
-        Image imagePort = new Image("file:lib/images/Port.png",25, 25, true, true);
+        Image imagePort = new Image("images/Port.png",25, 25, true, true);
 
         //group block inports and outports
         Group group = new Group();
@@ -557,6 +621,7 @@ public class Controller implements Initializable {
 
                 grid.add(label1, 1, 1);
                 grid.add(text1, 2, 1);
+                text2.setDisable(true);
                 break;
 
         }
@@ -572,7 +637,8 @@ public class Controller implements Initializable {
                  if (b == buttonTypeOk) {
                       ArrayList<Double> arr = new ArrayList<>();
                       arr.add(Double.parseDouble(text1.getText()));
-                      arr.add(Double.parseDouble(text2.getText()));
+                      if(!text2.isDisabled())
+                        arr.add(Double.parseDouble(text2.getText()));
                       return arr;
                  }
 
