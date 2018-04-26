@@ -29,9 +29,9 @@
 
     <target name="doc" description="vygeneruje dokumentaci">
         <javadoc locale="cs_CZ"
-                 packagenames="*"
+                 packagenames="components, gui, interfaces"
                  sourcepath="src"
-                 excludepackagenames="src.tests.*"
+                 excludepackagenames="src.tests"
                  defaultexcludes="yes"
                  destdir="${doc}"
                  author="true"
@@ -40,9 +40,7 @@
                  windowtitle="IJA projekt"
                  charset="UTF-8">
             <doctitle><![CDATA[<h1>IJA projekt</h1>]]></doctitle>
-            <bottom><![CDATA[<i>Copyright &#169; jv ap.</i>]]></bottom>
-            <tag name="todo" scope="all" description="To do:"/>
-            <group title="Group 1 Packages" packages="src.components.*"/>
+            <bottom><![CDATA[<i>Copyright &#169; Jan Vávra (xvavra20), Aleš Postulka (xpostu03).</i>]]></bottom>
         </javadoc>
     </target>
 
@@ -85,11 +83,10 @@
     </target>
 
     <target name="clean" description="clean up">
-        <delete>
-            <fileset dir="${dist}" includes="**/*"/>
-        </delete>
         <delete includeemptydirs="true">
+            <fileset dir="${dist}" includes="**/*"/>
             <fileset dir="${build}" includes="**/*"/>
+            <fileset dir="${doc}" includes="**/*"/>
         </delete>
     </target>
 
