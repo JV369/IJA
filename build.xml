@@ -19,6 +19,7 @@
         <pathelement location="${build.components}"/>
     </path>
 
+    <!-- překlad zdrojových kódů, zkopírování .fxml a obrázků do build -->
     <target name="compile-sources" description="compile the source" depends="clean">
         <javac srcdir="${src}" excludes="tests/*" destdir="${build}" includeantruntime="false"/>
         <copy todir="${build}" >
@@ -27,11 +28,12 @@
         </copy>
     </target>
 
+    <!-- vygenerování dokumentace -->
     <target name="doc" description="vygeneruje dokumentaci">
         <javadoc locale="cs_CZ"
-                 packagenames="*"
+                 packagenames="components, gui, interfaces"
                  sourcepath="src"
-                 excludepackagenames="src.tests.*"
+                 excludepackagenames="src.tests"
                  defaultexcludes="yes"
                  destdir="${doc}"
                  author="true"
@@ -40,12 +42,11 @@
                  windowtitle="IJA projekt"
                  charset="UTF-8">
             <doctitle><![CDATA[<h1>IJA projekt</h1>]]></doctitle>
-            <bottom><![CDATA[<i>Copyright &#169; jv ap.</i>]]></bottom>
-            <tag name="todo" scope="all" description="To do:"/>
-            <group title="Group 1 Packages" packages="src.components.*"/>
+            <bottom><![CDATA[<i>Copyright &#169; Jan Vávra (xvavra20), Aleš Postulka (xpostu03).</i>]]></bottom>
         </javadoc>
     </target>
 
+    <!-- vytvoření jar souboru -->
     <target name="compile" depends="compile-sources, doc" description="create .jar archive">
         <mkdir dir="${dist}"/>
         <jar destfile="${dist}/ija-client.jar"
@@ -57,12 +58,16 @@
         </jar>
     </target>
 
+
+    <!-- spuštění aplikace -->
     <target name="run" depends="compile">
         <java jar="${dist}/ija-client.jar"
               dir="${dist}"
               fork="true"/>
     </target>
-    <target name="tests-compile" depends="compile">
+
+    <!-- přeložení testů -->
+    <target name="tests-compile" depends="compile-sources">
         <mkdir dir="${build.tests}"/>
         <javac srcdir="${src.tests}" destdir="${build.tests}" includeantruntime="false">
             <classpath refid="classpath.tests"/>
@@ -70,7 +75,7 @@
     </target>
 
 
-
+    <!-- spuštění testů -->
     <target name="test" depends="tests-compile">
         <junit printsummary="on" haltonfailure="yes" fork="true">
             <classpath>
@@ -84,12 +89,12 @@
         </junit>
     </target>
 
+    <!-- vyčištění složek dest-client, build, doc -->
     <target name="clean" description="clean up">
-        <delete>
-            <fileset dir="${dist}" includes="**/*"/>
-        </delete>
         <delete includeemptydirs="true">
+            <fileset dir="${dist}" includes="**/*"/>
             <fileset dir="${build}" includes="**/*"/>
+            <fileset dir="${doc}" includes="**/*"/>
         </delete>
     </target>
 
