@@ -409,11 +409,11 @@ public class ControlerScheme{
         else if (scheme.connectionExists(port1.getPort(),port2.getPort())){
             displayError("Connection exists","Connection already exists");
         }
-        else if(port1.getPort().getName().equals("in") && scheme.getConnectionByPort(port1.getPort()) != null){
-            displayError("Connection exists","Can't connect multiple connections to inPort");
+        else if(scheme.getConnectionByPort(port1.getPort()) != null){
+            displayError("Connection exists","Can't make multiple connections from port");
         }
-        else if(port2.getPort().getName().equals("in") && scheme.getConnectionByPort(port2.getPort()) != null){
-            displayError("Connection exists","Can't connect multiple connections to inPort");
+        else if(scheme.getConnectionByPort(port2.getPort()) != null){
+            displayError("Connection exists","Can't make multiple connections from port");
         }
         else {
             GUIConnection line;
