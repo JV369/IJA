@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -180,8 +181,13 @@ public class Controller extends BorderPane {
             @Override
             public void handle(ActionEvent actionEvent) {
                 menuNextStep.setDisable(true);
+                if(controlerScheme.getScheme().detectCycle()){
+                    controlerScheme.displayError("Cycle detected!","There's a cycle in scheme. Delete connection to break the cycle.");
+                    return;
+                }
                 endBlocks = controlerScheme.getScheme().findEndBlocks();
                 //System.out.println(endBlocks);
+                detectUnsetPorts();
                 for(GUIBlock block : endBlocks){
                     blockStack = controlerScheme.getScheme().fillStack(block);
                     while(!blockStack.empty()) {
@@ -200,9 +206,13 @@ public class Controller extends BorderPane {
         menuStepRun.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                if(controlerScheme.getScheme().detectCycle()){
+                    controlerScheme.displayError("Cycle detected!","There's a cycle in scheme. Delete connection to break the cycle.");
+                    return;
+                }
                 endBlocks = controlerScheme.getScheme().findEndBlocks();
                 //System.out.println(endBlocks);
-
+                detectUnsetPorts();
                 if(!endBlocks.isEmpty()) {
                     blockStack = controlerScheme.getScheme().fillStack(endBlocks.get(0));
                     endBlocks.remove(0);
@@ -342,6 +352,22 @@ public class Controller extends BorderPane {
                 selectedBlock.setStyle("");
             selectedBlock = block;
             block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(255,0,0,0.8), 15, 0, 0, 0)");
+        }
+    }
+
+    private void detectUnsetPorts(){
+        for(int i = 0 ; i < GUIScheme.getChildren().size() ; i++){
+            if(GUIScheme.getChildren().get(i).getClass().getSimpleName().equals("Group")){
+                Group group = (Group) GUIScheme.getChildren().get(i);
+                for (int j = 1; j < group.getChildren().size() ;j++){
+                    GUIPort port = (GUIPort) group.getChildren().get(j);
+                    if(!port.getChanged() && port.getPort().getName().equals("in")){
+                        port.setFill(Color.BLUE);
+                        controlerScheme.setSelectedPort(port);
+                        controlerScheme.createDialog();
+                    }
+                }
+            }
         }
     }
 

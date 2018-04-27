@@ -11,6 +11,7 @@ import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.util.Callback;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -48,6 +49,10 @@ public class ControlerScheme{
         itemDelConnect.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                GUIPort connectedPort = findRelated(selectedConnect.getConnect().getIn().getId());
+                if(connectedPort != null) {
+                    connectedPort.setChanged();
+                }
                 blockScene.getChildren().remove(selectedConnect);
                 scheme.getConnections().remove(selectedConnect);
             }
@@ -166,6 +171,12 @@ public class ControlerScheme{
         //group block inports and outports
         Group group = new Group();
         GUIBlock block = new GUIBlock(type,imageBlock);
+        block.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                event.consume();
+            }
+        });
         block.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
             @Override
             public void handle(ContextMenuEvent contextMenuEvent) {
@@ -201,6 +212,7 @@ public class ControlerScheme{
                     if(connecting){
                         makeConnection(selectedGroup1,group,selectetGUIport1,port);
                     }
+                    event.consume();
                 }
             });
             actOffset += offset*2;
@@ -229,6 +241,7 @@ public class ControlerScheme{
                     if(connecting){
                         makeConnection(selectedGroup1,group,selectetGUIport1,port);
                     }
+                    event.consume();
                 }
             });
         }
@@ -240,6 +253,7 @@ public class ControlerScheme{
                 orgSceneY = event.getSceneY();
                 orgTranslateX = ((Group)(event.getSource())).getTranslateX();
                 orgTranslateY = ((Group)(event.getSource())).getTranslateY();
+                event.consume();
             }
         });
         group.setOnMouseDragged(new EventHandler<MouseEvent>() {
@@ -260,6 +274,7 @@ public class ControlerScheme{
                 ((Group)(event.getSource())).setTranslateX(newTranslateX);
                 ((Group)(event.getSource())).setTranslateY(newTranslateY);
                 block.getBlock().setCoordinates(newTranslateX,newTranslateY);
+                event.consume();
             }
         });
         //you cant spawn on menu
@@ -283,8 +298,12 @@ public class ControlerScheme{
         return group;
     }
 
+    public void setSelectedPort(GUIPort port){
+        this.selectedPort = port.getPort();
+        this.selectetGUIport1 = port;
+    }
 
-    private Dialog createDialog(){
+    public Dialog createDialog(){
         Dialog dialog = new Dialog();
         dialog.setTitle("Change value: "+ selectedPort.getType().getName());
         dialog.setResizable(true);
@@ -369,9 +388,9 @@ public class ControlerScheme{
     }
 
     public void displayError(String title,String messg){
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+        Alert alert = new Alert(Alert.AlertType.ERROR,messg);
         alert.setTitle(title);
-        alert.setContentText(messg);
+        alert.getDialogPane().getChildren().stream().filter(node -> node instanceof Label).forEach(node -> ((Label)node).setMinHeight(Region.USE_PREF_SIZE));
         alert.showAndWait();
     }
 
@@ -400,11 +419,13 @@ public class ControlerScheme{
             GUIConnection line;
             if(port1.getPort().getName().equals("out")) {
                 line = new GUIConnection(group1, group2, port1, port2);
-                port2.setChanged();
+                if(!port2.getChanged())
+                    port2.setChanged();
             }
             else {
                 line = new GUIConnection(group2, group1, port2, port1);
-                port1.setChanged();
+                if(!port1.getChanged())
+                    port1.setChanged();
             }
             scheme.addConnection(line);
             line.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
