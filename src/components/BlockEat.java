@@ -5,8 +5,13 @@ import java.util.ArrayList;
 /**
  * Třída pro simulující činnost "Eat" typu Human
  * @author Aleš Postulka (xpostu03)
+ * @see AbstractBlock
  */
 public class BlockEat extends AbstractBlock{
+
+    /**
+     * Konstruktor třídy BlockEat
+     */
     public BlockEat(){
         super();
         this.inPort.add(new Port("Human", "in"));
@@ -14,6 +19,12 @@ public class BlockEat extends AbstractBlock{
         this.outPort.add(new Port("Human", "out"));
     }
 
+    /**
+     * Provede výpočet nad blokem
+     * Vezme hodnoty weight a stamina typu Human na vstupu na základě hodnoty calories
+     * v typu Food na vstupním portu zvětší hodnoty stamina a weight a předá aktualizovaný
+     * typ Human na výstupní port
+     */
     public void execute(){
         Port in1 = this.inPort.get(0);
         Port in2 = this.inPort.get(1);

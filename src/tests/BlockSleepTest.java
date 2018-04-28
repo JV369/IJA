@@ -3,8 +3,6 @@
 import components.AbstractBlock;
 import components.BlockSleep;
 
-import components.Port;
-import org.junit.Assert;
 import org.junit.Before;
 
 import org.junit.Test;

@@ -1,10 +1,7 @@
 package gui;
 
-import components.Connection;
 import components.Port;
 import components.SerializableData;
-import interfaces.Block;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -228,21 +225,23 @@ public class Scheme {
     }
 
     public boolean detectCycle(){
-        ArrayList<Integer> idList = new ArrayList<>();
-        GUIConnection actConnect = connections.get(connections.size()-1);
-        Port outPort = null;
-        do {
-            if(idList.contains(actConnect.getConnect().getOut().getId()))
-                return true;
-            idList.add(actConnect.getConnect().getOut().getId());
+        for (GUIConnection currConn: this.connections) {
+            ArrayList<Integer> idList = new ArrayList<>();
+            GUIConnection actConnect = currConn;
+            Port outPort = null;
+            do {
+                if (idList.contains(actConnect.getConnect().getOut().getId()))
+                    return true;
+                idList.add(actConnect.getConnect().getOut().getId());
 
-            for (GUIBlock block:blocks) {
-                if (block.getBlock().getAllInPorts().contains(actConnect.getConnect().getIn())){
-                    outPort = block.getBlock().getAllOutPorts().get(0);
+                for (GUIBlock block : blocks) {
+                    if (block.getBlock().getAllInPorts().contains(actConnect.getConnect().getIn())) {
+                        outPort = block.getBlock().getAllOutPorts().get(0);
+                    }
                 }
-            }
-            actConnect = getConnectionByPort(outPort);
-        }while (actConnect != null);
+                actConnect = getConnectionByPort(outPort);
+            } while (actConnect != null);
+        }
         return false;
     }
 }

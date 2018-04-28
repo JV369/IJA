@@ -4,8 +4,19 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+/**
+ * Třída pro vytvoření položek, pro výběr bloku
+ * @author Jan Vávra (xvavra20)
+ * @author Aleš Postulka (xpostul03)
+ */
 public class MenuBlock extends ImageView{
     private Class abstractBlock;
+
+    /**
+     * Vytvoří blok podle jména třídy
+     * @param abstractBlock název třídy, kterou bude blok reprezentovat
+     * @param image obrázek pro reprezentaci třídy
+     */
     public MenuBlock(Class abstractBlock, Image image){
         super(image);
         this.abstractBlock = abstractBlock;
@@ -43,6 +54,10 @@ public class MenuBlock extends ImageView{
         Tooltip.install(this, tooltip);
     }
 
+    /**
+     * Metoda pro přístup ke třídě kterou blok reprezentuje
+     * @return třídu reprezentovanou tímto blokem
+     */
     public Class getAbstractBlockClass(){
         return this.abstractBlock;
     }
