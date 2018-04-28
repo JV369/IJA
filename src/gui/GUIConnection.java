@@ -7,8 +7,20 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Line;
 
+/**
+ * Třída po vytvoření pohledu na spoj
+ * @author Jan Vávra
+ */
 public class GUIConnection extends Line{
     private Connection connect;
+
+    /**
+     * Konstruktor pro třídu GUIConnection
+     * @param block1 blok, který obsahuje port1
+     * @param block2 blok, který obsahuje port2
+     * @param port1 port bloku 1, ke kterému se připojuje
+     * @param port2 port bloku 2, ke kterému se připojuje
+     */
     public GUIConnection(Group block1, Group block2, GUIPort port1, GUIPort port2){
         super();
         this.setStrokeWidth(5);
@@ -45,6 +57,10 @@ public class GUIConnection extends Line{
         });
     }
 
+    /**
+     * Vrátí data spoje
+     * @return spoj
+     */
     public Connection getConnect() {
         return connect;
     }

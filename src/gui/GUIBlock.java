@@ -46,7 +46,7 @@ public class GUIBlock extends ImageView{
 
     /**
      * Metoda pro přístup na data bloku
-     * @return blok
+     * @return blok uložený v this.block
      * @see AbstractBlock
      */
     public AbstractBlock getBlock() {

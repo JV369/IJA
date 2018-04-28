@@ -12,7 +12,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -23,7 +22,10 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Stack;
 
-
+/**
+ * Hlavní controller pro aplikaci
+ * @author Jan Vávra
+ */
 public class Controller extends BorderPane {
 
     private MenuBlock selectedBlock = null;
@@ -56,7 +58,10 @@ public class Controller extends BorderPane {
     private AnchorPane GUIScheme;
     private ControlerScheme controlerScheme;
 
-
+    /**
+     * Inicializace základních prvků (menu, tlačítka v menu) a
+     * přidání funkcionality jednotlivým prvkům
+     */
     @FXML
     public void initialize(){
         controlerScheme = new ControlerScheme();
@@ -187,7 +192,7 @@ public class Controller extends BorderPane {
                 }
                 endBlocks = controlerScheme.getScheme().findEndBlocks();
                 //System.out.println(endBlocks);
-                detectUnsetPorts();
+                controlerScheme.detectUnsetPorts();
                 for(GUIBlock block : endBlocks){
                     blockStack = controlerScheme.getScheme().fillStack(block);
                     while(!blockStack.empty()) {
@@ -212,7 +217,7 @@ public class Controller extends BorderPane {
                 }
                 endBlocks = controlerScheme.getScheme().findEndBlocks();
                 //System.out.println(endBlocks);
-                detectUnsetPorts();
+                controlerScheme.detectUnsetPorts();
                 if(!endBlocks.isEmpty()) {
                     blockStack = controlerScheme.getScheme().fillStack(endBlocks.get(0));
                     endBlocks.remove(0);
@@ -329,8 +334,10 @@ public class Controller extends BorderPane {
 
     }
 
-
-
+    /**
+     * Metoda reaguje na zmáčknutí bloku v levém menu
+     * @param block blok, který byl zmáčknut
+     */
     private void handleMenuClick(MenuBlock block){
         //remove select of block
         if(selected && block.getAbstractBlockClass().equals(selectedBlock.getAbstractBlockClass())) {
@@ -355,21 +362,7 @@ public class Controller extends BorderPane {
         }
     }
 
-    private void detectUnsetPorts(){
-        for(int i = 0 ; i < GUIScheme.getChildren().size() ; i++){
-            if(GUIScheme.getChildren().get(i).getClass().getSimpleName().equals("Group")){
-                Group group = (Group) GUIScheme.getChildren().get(i);
-                for (int j = 1; j < group.getChildren().size() ;j++){
-                    GUIPort port = (GUIPort) group.getChildren().get(j);
-                    if(!port.getChanged() && port.getPort().getName().equals("in")){
-                        port.setFill(Color.BLUE);
-                        controlerScheme.setSelectedPort(port);
-                        controlerScheme.createDialog();
-                    }
-                }
-            }
-        }
-    }
+
 
 
 }

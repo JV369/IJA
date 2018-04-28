@@ -10,15 +10,28 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Stack;
 
+/**
+ * Třída pro práci s daty schématu
+ * @author Jan Vávra (xvavra20)
+ * @author Aleš Postulka (xpostu03)
+ */
 public class Scheme {
     private ArrayList<GUIBlock> blocks;
     private ArrayList<GUIConnection> connections;
 
+    /**
+     * KOnstruktor třídy Scheme
+     */
     public Scheme(){
         this.blocks = new ArrayList<>();
         this.connections = new ArrayList<>();
     }
 
+    /**
+     * přidá blok do pole bloků
+     * @param block blok pro přidání
+     * @return false pokud blok už existuje v poli, true pokud jsme blok přidali
+     */
     public boolean addBlock(GUIBlock block){
         if(!this.blocks.contains(block)) {
             this.blocks.add(block);
@@ -27,6 +40,11 @@ public class Scheme {
         return false;
     }
 
+    /**
+     * přidá spoj do pole spojů
+     * @param connection spoj pro přidání
+     * @return false pokud spoj už existuje v poli, true pokud jsme spoj přidali
+     */
     public boolean addConnection(GUIConnection connection){
         if(!this.connections.contains(connection)){
             this.connections.add(connection);
@@ -34,14 +52,27 @@ public class Scheme {
         return false;
     }
 
+    /**
+     * Metoda pro přístup k poli bloků
+     * @return pole bloků
+     */
     public ArrayList<GUIBlock> getBlocks() {
         return blocks;
     }
 
+    /**
+     * Metoda pro přístup k poli spojů
+     * @return pole spojů
+     */
     public ArrayList<GUIConnection> getConnections() {
         return connections;
     }
 
+    /**
+     * Vrátí první spoj ve kterém se vyskytuje port
+     * @param port port, podle kterého vyhledáváme spoj
+     * @return spoj pokud existuje, jinak null
+     */
     public GUIConnection getConnectionByPort(Port port){
         for (GUIConnection conn: this.connections) {
             if(port.getId() == conn.getConnect().getIn().getId())
@@ -53,6 +84,12 @@ public class Scheme {
         return null;
     }
 
+    /**
+     * Metoda pro zjištění jestli spoj mezi porty existuje
+     * @param port1 port, podle kterrého vyhledáváme spoj
+     * @param port2 port, podle kterrého vyhledáváme spoj
+     * @return true pokud spoj mezi porty existuje, jinak false
+     */
     public boolean connectionExists(Port port1, Port port2){
         for (GUIConnection conn: this.connections) {
             if(conn.getConnect().getIn().getId() == port1.getId() && conn.getConnect().getOut().getId() == port2.getId()){
@@ -65,12 +102,19 @@ public class Scheme {
         return false;
     }
 
-
+    /**
+     * Vyčistí pole bloků a pole spojů
+     */
     public void clearScheme(){
         this.blocks.clear();
         this.connections.clear();
     }
 
+    /**
+     * Metoda pro uložení aktuálního schémata
+     * @param file soubor, do kterého budeme data ukládat
+     * @return true pokud se podařilo data uložit, jinak false
+     */
     public boolean saveFile(File file){
         if(file == null)
             return false;
@@ -110,6 +154,11 @@ public class Scheme {
         return true;
     }
 
+    /**
+     * Metoda vyhledá všechny id portů, ke kterým je připojený parametr port
+     * @param port port, pro který vyhledáváme všechny spoje
+     * @return pole id portů, ke kterým je port připojený
+     */
     private ArrayList<Integer> searchConnectTo(Port port){
         ArrayList<Integer> arr = new ArrayList<>();
         for (GUIConnection conn: this.connections) {
@@ -124,7 +173,10 @@ public class Scheme {
         return arr;
     }
 
-
+    /**
+     * TODO
+     * @return
+     */
     public  ArrayList<GUIBlock> findEndBlocks(){
         ArrayList<GUIBlock> endBlocks = new ArrayList<>();
         boolean connected;
@@ -145,6 +197,11 @@ public class Scheme {
         return endBlocks;
     }
 
+    /**
+     * TODO + asi promaž ten zakomentovaný kod
+     * @param blockStack
+     * @throws InterruptedException
+     */
     public void executeBlock(Stack<GUIBlock> blockStack) throws InterruptedException {
         /*GUIConnection connection;
         Port p;
@@ -188,6 +245,11 @@ public class Scheme {
         //return blockStack;
     }
 
+    /**
+     * TODO
+     * @param block
+     * @return
+     */
     public Stack<GUIBlock> fillStack(GUIBlock block){
         Stack<GUIBlock> blockStack = new Stack<>();
         LinkedList<GUIBlock> blockQueue = new LinkedList<>();
@@ -224,6 +286,10 @@ public class Scheme {
         return blockStack;
     }
 
+    /**
+     * Metoda detekuje, jestli mezi aktuálním spojením bloků neexistuje cyklus
+     * @return true pokud cyklus existuje, jinak false
+     */
     public boolean detectCycle(){
         for (GUIConnection currConn: this.connections) {
             ArrayList<Integer> idList = new ArrayList<>();

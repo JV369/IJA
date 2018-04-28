@@ -10,18 +10,17 @@ import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
-import javafx.util.Callback;
-import java.util.ArrayList;
-import java.util.Optional;
+import javafx.scene.paint.Color;
 
-
+/**
+ * Controller pro grafické operace nad schématem
+ * @author Jan Vávra
+ */
 public class ControlerScheme{
 
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
-    private Port selectedPort;
     private GUIConnection selectedConnect;
     private GUIPort selectetGUIport1;
     private GUIBlock selectedGUIBlock;
@@ -37,7 +36,10 @@ public class ControlerScheme{
 
     private AnchorPane blockScene;
 
-
+    /**
+     * Inicializuje controller
+     * @param blockScene scéna
+     */
     @FXML
     public void initialize(AnchorPane blockScene){
         scheme = new Scheme();
@@ -71,7 +73,7 @@ public class ControlerScheme{
 
             @Override
             public void handle(ActionEvent event) {
-                createDialog();
+                selectetGUIport1.createDialog();
             }
         });
 
@@ -135,15 +137,32 @@ public class ControlerScheme{
         contextMenuBlock.getItems().add(itemDelBlock);
     }
 
+    /**
+     * Metoda vrací třídu pro operace nad schématem
+     * @return třídu Scheme
+     * @see Scheme
+     */
     public Scheme getScheme() {
         return scheme;
     }
 
+    /**
+     * Vyčistí všechny bloky a spoje na scéně
+     */
     public void clearScene(){
         scheme.clearScheme();
         blockScene.getChildren().clear();
     }
 
+    /**
+     * Metoda pro vytvoření bloku a vložení ho do scény
+     * @param type název třídy bloku, který chceme vytvořit
+     * @param fromMenu true pokud vytváříme blok z menu, false pokud vytváříme blok se souboru
+     * @param x souřadnice, kde máme vytvořit blok na scéně
+     * @param y souřadnice, kde máme vytvořit blok na scéně
+     * @return vrací seskupení portů a bloku v Group
+     * @see Group
+     */
     public Group createBlock(String type, boolean fromMenu, double x, double y){
         String url;
         switch (type){
@@ -298,87 +317,13 @@ public class ControlerScheme{
         return group;
     }
 
-    public void setSelectedPort(GUIPort port){
-        this.selectedPort = port.getPort();
-        this.selectetGUIport1 = port;
-    }
 
-    public Dialog createDialog(){
-        Dialog dialog = new Dialog();
-        dialog.setTitle("Change value: "+ selectedPort.getType().getName());
-        dialog.setResizable(true);
-        GridPane grid = new GridPane();
-        TextField text1 = new TextField();
-        TextField text2 = new TextField();
-        Label label1;
-        Label label2;
-
-        switch (selectedPort.getType().getName()){
-            case "Human":
-                label1 = new Label("Weight: ");
-                label2 = new Label("Stamina: ");
-                text1.setText(Double.toString(selectedPort.getType().getValue("weight")));
-                text2.setText(Double.toString(selectedPort.getType().getValue("stamina")));
-
-                grid.add(label1, 1, 1);
-                grid.add(text1, 2, 1);
-                grid.add(label2, 1, 2);
-                grid.add(text2, 2, 2);
-                break;
-            case "Time":
-                label1 = new Label("Hours: ");
-                label2 = new Label("Minutes: ");
-                text1.setText(Double.toString(selectedPort.getType().getValue("hours")));
-                text2.setText(Double.toString(selectedPort.getType().getValue("minutes")));
-
-                grid.add(label1, 1, 1);
-                grid.add(text1, 2, 1);
-                grid.add(label2, 1, 2);
-                grid.add(text2, 2, 2);
-                break;
-            case "Food":
-                label1 = new Label("Calories: ");
-                text1.setText(Double.toString(selectedPort.getType().getValue("calories")));
-
-                grid.add(label1, 1, 1);
-                grid.add(text1, 2, 1);
-                text2.setDisable(true);
-                break;
-
-        }
-
-        dialog.getDialogPane().setContent(grid);
-        ButtonType buttonTypeOk = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
-
-        dialog.setResultConverter(new Callback<ButtonType, ArrayList<Double>>() {
-            @Override
-            public ArrayList<Double> call(ButtonType b) {
-
-                if (b == buttonTypeOk) {
-                    ArrayList<Double> arr = new ArrayList<>();
-                    arr.add(Double.parseDouble(text1.getText()));
-                    if(!text2.isDisabled())
-                        arr.add(Double.parseDouble(text2.getText()));
-                    return arr;
-                }
-
-                return null;
-            }
-        });
-
-        Optional<ArrayList<Double>> result = dialog.showAndWait();
-        if (result.isPresent()){
-            selectedPort.update(selectedPort.getType().getName(),result.get());
-            if(selectedPort.getName().equals("in") && !selectetGUIport1.getChanged()){
-                selectetGUIport1.setChanged();
-            }
-        }
-        return dialog;
-    }
-
+    /**
+     * Metoda pro reakci na kliknutí na port
+     * @param port kliknutý port
+     * @param group seskupení, ve kterém se port nachází
+     */
     private void portContext(GUIPort port, Group group){
-        selectedPort = port.getPort();
         if(!connecting) {
             selectedGroup1 = group;
             selectetGUIport1 = port;
@@ -387,6 +332,11 @@ public class ControlerScheme{
         contextMenuBlock.hide();
     }
 
+    /**
+     * Zobrazí okno s chybovým hlášením
+     * @param title nadpis chyby
+     * @param messg text chyby
+     */
     public void displayError(String title,String messg){
         Alert alert = new Alert(Alert.AlertType.ERROR,messg);
         alert.setTitle(title);
@@ -394,6 +344,13 @@ public class ControlerScheme{
         alert.showAndWait();
     }
 
+    /**
+     * Vytvoří spoj mezi porty
+     * @param group1 seskupení, do kterého patří port1
+     * @param group2 seskupení, do kterého patří port2
+     * @param port1 port, pro který chceme vytvořit spojení
+     * @param port2 port, pro který chceme vytvořit spojení
+     */
     public void makeConnection(Group group1, Group group2, GUIPort port1, GUIPort port2){
         if(!port1.getPort().getType().getName().equals(port2.getPort().getType().getName())) {
             displayError("Incompatible types","Can't connect "+ port1.getPort().getType().getName() +
@@ -440,6 +397,11 @@ public class ControlerScheme{
         connecting = false;
     }
 
+    /**
+     * Najde port podle id
+     * @param id id portu, který chceme najít
+     * @return Pohled na port
+     */
     private GUIPort findRelated(int id){
         for (int i = 0; i < blockScene.getChildren().size(); i++) {
             if(blockScene.getChildren().get(i).getClass().getSimpleName().equals("Group")) {
@@ -453,5 +415,25 @@ public class ControlerScheme{
             }
         }
         return null;
+    }
+
+    /**
+     * Metoda detekuje, u jakých portů nebyly změněny
+     * implicitní hodnoty a dá možnost tyto hodnoty změnit
+     */
+    public void detectUnsetPorts(){
+        for(int i = 0 ; i < blockScene.getChildren().size() ; i++){
+            if(blockScene.getChildren().get(i).getClass().getSimpleName().equals("Group")){
+                Group group = (Group) blockScene.getChildren().get(i);
+                for (int j = 1; j < group.getChildren().size() ;j++){
+                    GUIPort port = (GUIPort) group.getChildren().get(j);
+                    if(!port.getChanged() && port.getPort().getName().equals("in")){
+                        port.setFill(Color.BLUE);
+                        selectetGUIport1 = port;
+                        port.createDialog();
+                    }
+                }
+            }
+        }
     }
 }
