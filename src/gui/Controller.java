@@ -24,7 +24,8 @@ import java.util.Stack;
 
 /**
  * Hlavní controller pro aplikaci
- * @author Jan Vávra
+ * @author Jan Vávra (xvavra20)
+ * @author Aleš Postulka (xpostu03)
  */
 public class Controller extends BorderPane {
 
@@ -191,16 +192,11 @@ public class Controller extends BorderPane {
                     return;
                 }
                 endBlocks = controlerScheme.getScheme().findEndBlocks();
-                //System.out.println(endBlocks);
                 controlerScheme.detectUnsetPorts();
                 for(GUIBlock block : endBlocks){
                     blockStack = controlerScheme.getScheme().fillStack(block);
                     while(!blockStack.empty()) {
-                        try {
-                            controlerScheme.getScheme().executeBlock(blockStack);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        controlerScheme.getScheme().executeBlock(blockStack.peek());
                         blockStack.pop().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
                     }
                 }
@@ -222,11 +218,7 @@ public class Controller extends BorderPane {
                     blockStack = controlerScheme.getScheme().fillStack(endBlocks.get(0));
                     endBlocks.remove(0);
                     if (!blockStack.empty()) {
-                        try {
-                            controlerScheme.getScheme().executeBlock(blockStack);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                        controlerScheme.getScheme().executeBlock(blockStack.peek());
                         menuNextStep.setDisable(false);
                     }
                 }
@@ -239,21 +231,13 @@ public class Controller extends BorderPane {
             public void handle(ActionEvent actionEvent) {
                 blockStack.pop().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,255,0,0.8), 15, 0, 0, 0)");
                 if(!blockStack.empty()) {
-                    try {
-                        controlerScheme.getScheme().executeBlock(blockStack);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    controlerScheme.getScheme().executeBlock(blockStack.peek());
                 }else{
                     if(!endBlocks.isEmpty()) {
                         blockStack = controlerScheme.getScheme().fillStack(endBlocks.get(0));
                         endBlocks.remove(0);
                         if (!blockStack.empty()) {
-                            try {
-                                controlerScheme.getScheme().executeBlock(blockStack);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                            controlerScheme.getScheme().executeBlock(blockStack.peek());
                         }
                     }else{
                         menuNextStep.setDisable(true);
@@ -330,9 +314,8 @@ public class Controller extends BorderPane {
                 }
             }
         });
-
-
     }
+
 
     /**
      * Metoda reaguje na zmáčknutí bloku v levém menu

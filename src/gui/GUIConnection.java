@@ -9,7 +9,7 @@ import javafx.scene.shape.Line;
 
 /**
  * Třída po vytvoření pohledu na spoj
- * @author Jan Vávra
+ * @author Jan Vávra (xvavra20)
  */
 public class GUIConnection extends Line{
     private Connection connect;

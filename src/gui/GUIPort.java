@@ -14,7 +14,7 @@ import java.util.Optional;
 
 /**
  * Třída pro vytvoření poheldu na port
- * @author Jan Vávra
+ * @author Jan Vávra (xvavra20)
  */
 public class GUIPort extends Rectangle{
     private Port port;

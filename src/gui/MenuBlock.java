@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
 /**
  * Třída pro vytvoření položek, pro výběr bloku
  * @author Jan Vávra (xvavra20)
- * @author Aleš Postulka (xpostul03)
+ * @author Aleš Postulka (xpostu03)
  */
 public class MenuBlock extends ImageView{
     private Class abstractBlock;

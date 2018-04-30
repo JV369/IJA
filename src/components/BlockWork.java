@@ -3,7 +3,7 @@ package components;
 import java.util.ArrayList;
 
 /**
- * Třída pro simulující činnost "Work" typu Human
+ * Třída pro vytvoření bloku simulující činnost "Work" typu Human
  * @author Aleš Postulka (xpostu03)
  * @see AbstractBlock
  */
@@ -17,10 +17,10 @@ public class BlockWork extends AbstractBlock {
 
     /**
      * Provede operaci nad blokem
-     * Vezme hodnoty weight a stamina typu Human na vstupu na základě času
-     * vstupním portu zmenší hodnoty stamina a weight a předá aktualizovaný
-     * typ Human na výstupní port<p>
-     * Tento blok zmenšuje pomaleji hodnotu weight než BlockSport
+     * Vezme hodnoty weight a stamina typu Human a na vstupu na základě času
+     * vstupním portu zmenší hodnoty stamina a weight a aktualizuje
+     * typ Human na výstupním portu
+     * Tento blok má menší vliv na stamina a weight než BlockSport
      * @see BlockSport
      */
     public void execute(){
@@ -30,9 +30,11 @@ public class BlockWork extends AbstractBlock {
 
         ArrayList<Double> values = new ArrayList<>();
 
-
         double weight = in1.getType().getValue("weight") - ((in2.getType().getValue("hours") + (in2.getType().getValue("minutes")/60))*0.12);
         double stamina = in1.getType().getValue("stamina") - ((in2.getType().getValue("hours") + (in2.getType().getValue("minutes")/60))*7);
+
+        weight = weight < 0? 0: weight;
+        stamina = stamina < 0? 0: stamina;
 
         values.add(weight);
         values.add(stamina);

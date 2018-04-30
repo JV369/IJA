@@ -3,7 +3,7 @@ package components;
 import java.util.ArrayList;
 
 /**
- * Třída pro simulující činnost "Sleep" typu Human
+ * Třída pro vytvoření bloku simulující činnost "Sleep" typu Human
  * @author Aleš Postulka (xpostu03)
  * @see AbstractBlock
  */
@@ -21,8 +21,8 @@ public class BlockSleep extends AbstractBlock {
     /**
      * Provede výpočet nad blokem
      * Vezme hodnotu energie typu Human na vstupním portu a na základě
-     * uvedeného času v druhém portu jí zvětší a předá aktualizovaný
-     * typ Human na výstupní port
+     * uvedeného času v druhém portu jí zvětší aktualizuje
+     * typ Human na výstupním portu
      */
     public void execute(){
         Port in1 = this.inPort.get(0);

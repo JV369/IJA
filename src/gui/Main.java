@@ -7,8 +7,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 //import org.scenicview.ScenicView;
 
+/**
+ * Třída Main
+ * @author Jan Vávra (xvavra20)
+ * @author Aleš Postulka (xpostu03)
+ */
 public class Main extends Application {
-
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("template.fxml"));

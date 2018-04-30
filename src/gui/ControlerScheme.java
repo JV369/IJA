@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 
 /**
  * Controller pro grafické operace nad schématem
- * @author Jan Vávra
+ * @author Jan Vávra (xvavra20)
  */
 public class ControlerScheme{
 
@@ -328,7 +328,6 @@ public class ControlerScheme{
             selectedGroup1 = group;
             selectetGUIport1 = port;
         }
-
         contextMenuBlock.hide();
     }
 
