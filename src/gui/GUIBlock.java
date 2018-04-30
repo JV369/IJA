@@ -2,19 +2,22 @@ package gui;
 
 import components.*;
 
-import interfaces.Block;
-import javafx.event.Event;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
 
+/**
+ * Třída pro vytvoření grafickou reprezentaci bloku ve schématu
+ * @author Jan Vávra (xvavra20)
+ */
 public class GUIBlock extends ImageView{
 
     private AbstractBlock block;
 
+    /**
+     * Konstuktor třídy GUIBlock
+     * @param type jméno třídy, kterou bude reprezentovat
+     * @param image obrázek reprezencující třídy
+     */
     public GUIBlock(String type, Image image){
         super(image);
 
@@ -41,6 +44,11 @@ public class GUIBlock extends ImageView{
 
     }
 
+    /**
+     * Metoda pro přístup na data bloku
+     * @return blok uložený v this.block
+     * @see AbstractBlock
+     */
     public AbstractBlock getBlock() {
         return block;
     }

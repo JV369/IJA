@@ -9,8 +9,6 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-
-
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("template.fxml"));
@@ -20,6 +18,7 @@ public class Main extends Application {
         stage.setTitle("Human simulator");
         stage.show();
     }
+
 
     public static void main(String[] args) {
         launch(args);

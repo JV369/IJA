@@ -2,6 +2,11 @@ package components;
 
 import java.util.ArrayList;
 
+/**
+ * Třída pro simulující činnost "Work" typu Human
+ * @author Aleš Postulka (xpostu03)
+ * @see AbstractBlock
+ */
 public class BlockWork extends AbstractBlock {
     public BlockWork(){
         super();
@@ -10,6 +15,14 @@ public class BlockWork extends AbstractBlock {
         this.outPort.add(new Port("Human", "out"));
     }
 
+    /**
+     * Provede operaci nad blokem
+     * Vezme hodnoty weight a stamina typu Human na vstupu na základě času
+     * vstupním portu zmenší hodnoty stamina a weight a předá aktualizovaný
+     * typ Human na výstupní port<p>
+     * Tento blok zmenšuje pomaleji hodnotu weight než BlockSport
+     * @see BlockSport
+     */
     public void execute(){
         Port in1 = this.inPort.get(0);
         Port in2 = this.inPort.get(1);

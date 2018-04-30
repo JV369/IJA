@@ -2,7 +2,6 @@
 
 import components.AbstractBlock;
 import components.BlockEat;
-import components.BlockSleep;
 import components.BlockSport;
 import interfaces.Block;
 import org.junit.Before;

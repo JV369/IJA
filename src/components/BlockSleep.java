@@ -5,8 +5,12 @@ import java.util.ArrayList;
 /**
  * Třída pro simulující činnost "Sleep" typu Human
  * @author Aleš Postulka (xpostu03)
+ * @see AbstractBlock
  */
 public class BlockSleep extends AbstractBlock {
+    /**
+     * Konstruktor třídy BlockSleep
+     */
     public BlockSleep(){
         super();
         this.inPort.add(new Port("Human", "in"));
@@ -14,6 +18,12 @@ public class BlockSleep extends AbstractBlock {
         this.outPort.add(new Port("Human", "out"));
     }
 
+    /**
+     * Provede výpočet nad blokem
+     * Vezme hodnotu energie typu Human na vstupním portu a na základě
+     * uvedeného času v druhém portu jí zvětší a předá aktualizovaný
+     * typ Human na výstupní port
+     */
     public void execute(){
         Port in1 = this.inPort.get(0);
         Port in2 = this.inPort.get(1);

@@ -1,6 +1,5 @@
 package components;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,11 +8,21 @@ import static java.lang.Double.NaN;
 /**
  * Třída pro vytvoření a správu typu uloženého v portu
  * @author Jan Vávra (xvavra20)
+ * @author Aleš Postulka (xpostu03)
  */
 public class Type {
     private String name;
     private Map<String,Double> values;
 
+    /**
+     * Konstruktor třídy Type
+     * Na základě jména se vytvoří příslušný typ
+     * Máme 3 typy:
+     * Human - člověk, kde uchováváme váhu(weight) a energii(stamina)
+     * Time - čas, kde uchováváme hodiny(hours) a minuty(minutes)
+     * Food - jídlo, kde uchováváme kalorie(calories)
+     * @param name název typu, který chceme vytvořit
+     */
     public Type(String name){
         this.name = name;
         values = new HashMap<>();
@@ -36,10 +45,19 @@ public class Type {
         } 
     }
 
+    /**
+     * Metoda pro zjištění jména typu třídy
+     * @return název vytvořeného typu
+     */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Vrátí hodnotu na základě názvu hodnoty
+     * @param property jméno hodnoty namapované v values
+     * @return hodnotu pokud jméno existuje, jinak NaN
+     */
     public double getValue(String property){
         if(values.containsKey(property)){
             return values.get(property);
@@ -47,14 +65,21 @@ public class Type {
         return NaN;
     }
 
+    /**
+     * Metoda pro přístup k mapě hodnot
+     * @return Mapu hodnot
+     * @see Map
+     */
     public Map getAllValues(){
         return this.values;
     }
 
-    public void setAllValues(Map values){
-        this.values = values;
-    }
-
+    /**
+     * Nastaví property v values na value
+     * @param property jméno hodnoty namapované v values
+     * @param value hodnota, na kterou se má změnit
+     * @return true pokud se hodnota aktualizovala, jinak false
+     */
     public boolean update(String property, double value){
         if((this.name.equals("Human") || this.name.equals("Time") || this.name.equals("Food")) && this.values.containsKey(property)) {
             this.values.put(property, value);
@@ -62,32 +87,4 @@ public class Type {
         }
         return false;
     }
-
-    /*
-    public boolean updateHuman(double weight, double stamina){
-        if(this.name.equals("Human")){
-            this.values.put("weight",weight);
-            this.values.put("stamina",stamina);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean updateTime(double hours, double minutes){
-        if(this.name.equals("Time")){
-            this.values.put("hours",hours);
-            this.values.put("minutes",minutes);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean updateFood(double calories){
-        if(this.name.equals("Human")){
-            this.values.put("calories",calories);
-            return true;
-        }
-        return false;
-    }
-    */
 }
