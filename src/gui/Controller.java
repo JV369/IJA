@@ -93,7 +93,7 @@ public class Controller extends BorderPane {
                 File file = fileChooser.showSaveDialog(new Stage());
                 if(file != null) {
                     Stage stage = (Stage) GUIScheme.getScene().getWindow();
-                    stage.setTitle(file.getName().split("\\.")[0] + " - Human Simulator");
+                    stage.setTitle(file.getName() + " - Human Simulator");
                     controlerScheme.getScheme().saveFile(file);
                 }
             }
@@ -108,7 +108,7 @@ public class Controller extends BorderPane {
                 if(file != null){
                     try {
                         Stage stage = (Stage) GUIScheme.getScene().getWindow();
-                        stage.setTitle(file.getName().split("\\.")[0] + " - Human Simulator");
+                        stage.setTitle(file.getName() + " - Human Simulator");
                         FileInputStream stream = new FileInputStream(file);
                         ObjectInputStream objStream = new ObjectInputStream(stream);
                         controlerScheme.clearScene();
