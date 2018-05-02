@@ -89,7 +89,7 @@ public class Controller extends BorderPane {
             public void handle(ActionEvent actionEvent) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Save file");
-                fileChooser.setInitialFileName("simulation.hs");
+                fileChooser.setInitialFileName("simulation.sim");
                 File file = fileChooser.showSaveDialog(new Stage());
                 if(file != null) {
                     Stage stage = (Stage) GUIScheme.getScene().getWindow();
