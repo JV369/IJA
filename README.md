@@ -26,3 +26,9 @@
  - 'ant test' zkompiluje zdrojové soubory a spustí testy
  - 'ant doc' vygeneruje dokumentaci 
  - 'ant clean' vymaže zkompilované soubory, jar archív a dokumentaci
+
+## Zdroje pro obrázky
+ - BlockCook - https://www.shareicon.net/cover-cook-kitchen-cooking-727446
+ - BlockWork - https://www.shareicon.net/people-furniture-computers-work-chair-working-humanpictos-766192
+ - BlockSport - https://commons.wikimedia.org/wiki/File:Runner_stickman.png
+ - BlockFood - https://www.shareicon.net/eating-spoon-cutlery-restaurant-eat-knive-lunch-dinner-fork-93286
