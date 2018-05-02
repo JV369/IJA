@@ -20,7 +20,7 @@ public class Scheme {
     private ArrayList<GUIConnection> connections;
 
     /**
-     * KOnstruktor třídy Scheme
+     * Konstruktor třídy Scheme
      */
     public Scheme(){
         this.blocks = new ArrayList<>();
@@ -28,7 +28,7 @@ public class Scheme {
     }
 
     /**
-     * přidá blok do pole bloků
+     * Přidá blok do pole bloků
      * @param block blok pro přidání
      * @return false pokud blok už existuje v poli, true pokud jsme blok přidali
      */
@@ -41,7 +41,7 @@ public class Scheme {
     }
 
     /**
-     * přidá spoj do pole spojů
+     * Přidá spoj do pole spojů
      * @param connection spoj pro přidání
      * @return false pokud spoj už existuje v poli, true pokud jsme spoj přidali
      */
@@ -174,8 +174,8 @@ public class Scheme {
     }
 
     /**
-     * TODO
-     * @return
+     * Najde koncové bloky (bloky, které na výstupním portu nemají spojení).
+     * @return seznam koncových bloků
      */
     public  ArrayList<GUIBlock> findEndBlocks(){
         ArrayList<GUIBlock> endBlocks = new ArrayList<>();
@@ -192,63 +192,24 @@ public class Scheme {
             if(!connected){
                 endBlocks.add(block);
             }
-            //block.getBlock().execute();
         }
         return endBlocks;
     }
 
     /**
-     * TODO + asi promaž ten zakomentovaný kod
-     * @param blockStack
-     * @throws InterruptedException
+     * Nastaví barvu stínu bloku na modrou a vypočítá jej.
+     * @param block vypočítávaný blok
      */
-    public void executeBlock(Stack<GUIBlock> blockStack) throws InterruptedException {
-        /*GUIConnection connection;
-        Port p;
-
-        //prohledá všechny porty z bloku na vrcholu zásobníku
-        for (Port port:blockStack.peek().getBlock().getAllInPorts()){
-            connection = this.getConnectionByPort(port);
-            if(connection != null) {
-                //connected = true;
-                p = connection.getConnect().getOut();
-
-                boolean found = false;
-                for(GUIBlock tmpBl:blocks){
-                    for(Port tmpPort:tmpBl.getBlock().getAllOutPorts()){
-                        if(tmpPort.equals(p)){
-                            found = true;
-                            break;
-                        }
-                    }
-                    if(found){
-                        blockStack.push(tmpBl);
-                        this.executeBlocks(blockStack);
-                        break;
-                    }
-                }
-            }
-        }
-*/
-        GUIBlock block = blockStack.peek();
-
+    public void executeBlock(GUIBlock block){
         block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,200,255,0.8), 15, 0, 0, 0)");
         block.getBlock().execute();
-        /*Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Run");
-        alert.setHeaderText("I am running");
-        alert.setContentText(String.valueOf(block.getBlock().getId()));
-        alert.showAndWait();*/
-
-        //block.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 15, 0, 0, 0)");
-        //Thread.sleep(2000);
-        //return blockStack;
     }
 
     /**
-     * TODO
-     * @param block
-     * @return
+     * Vytvoří zásobník a naplní jej bloky ze schématu.
+     * Na vrcholu zásobníku bude blok, který se má vypočítat jako první.
+     * @param block Koncový blok (bude na dně zásobníku - počítá se poslední)
+     * @return Zásobník naplněný bloky
      */
     public Stack<GUIBlock> fillStack(GUIBlock block){
         Stack<GUIBlock> blockStack = new Stack<>();
@@ -259,7 +220,8 @@ public class Scheme {
         blockQueue.addLast(block);
         while(blockQueue.size() != 0) {
             //prohledání všech vstupních portů bloku
-            for (Port port : blockQueue.peekFirst().getBlock().getAllInPorts()) {
+            for(int i = blockQueue.peekFirst().getBlock().getAllInPorts().size()-1; i >=0 ; i--){
+                Port port = blockQueue.peekFirst().getBlock().getInPort(i);
                 connection = this.getConnectionByPort(port);
                 //pokud je port součástí spojení, je vyhledán blok na druhé straně spojení
                 if (connection != null) {
