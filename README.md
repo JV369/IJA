@@ -19,3 +19,10 @@
     rozdeleni.txt - (soubor) soubor obsahuje rozdělení bodů mezi členy týmu (pokud tento soubor neexistuje, předpokládá se 
                          rovnoměrné rozdělení, vizte hodnocení projektu)
     build.xml     - (soubor) build file pro aplikaci ant
+
+## Spuštění
+ - 'ant run' spustí aplikace
+ - 'ant compile' zkompiluje zdrojové soubory, vytvoří jar archív a vygeneruje dokumentaci
+ - 'ant test' zkompiluje zdrojové soubory a spustí testy
+ - 'ant doc' vygeneruje dokumentaci 
+ - 'ant clean' vymaže zkompilované soubory, jar archív a dokumentaci

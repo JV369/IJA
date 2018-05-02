@@ -54,13 +54,15 @@
             <manifest>
                 <attribute name="Main-Class"
                            value="gui.Main"/>
+                <attribute name="Application-Name"
+                            value="Human Simulator"/>
             </manifest>
         </jar>
     </target>
 
 
     <!-- spuštění aplikace -->
-    <target name="run" depends="compile">
+    <target name="run">
         <java jar="${dist}/ija-client.jar"
               dir="${dist}"
               fork="true"/>
