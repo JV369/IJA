@@ -136,27 +136,32 @@ public class Controller extends BorderPane {
                                         case "Human":
                                             if(!(port.getPort().getType().getValue("weight") == input.value1)) {
                                                 port.getPort().getType().update("weight", input.value1);
-                                                port.setChanged();
+                                                if(port.getPort().getName().equals("in"))
+                                                    port.setChanged();
                                             }
                                             if(!(port.getPort().getType().getValue("stamina") == input.value2)) {
                                                 port.getPort().getType().update("stamina", input.value2);
-                                                port.setChanged();
+                                                if(port.getPort().getName().equals("in") && !port.getChanged())
+                                                    port.setChanged();
                                             }
                                             break;
                                         case "Time":
                                             if(!(port.getPort().getType().getValue("hours") == input.value1)) {
                                                 port.getPort().getType().update("hours", input.value1);
-                                                port.setChanged();
+                                                if(port.getPort().getName().equals("in"))
+                                                    port.setChanged();
                                             }
                                             if(!(port.getPort().getType().getValue("minutes") == input.value2)) {
                                                 port.getPort().getType().update("minutes", input.value2);
-                                                port.setChanged();
+                                                if(port.getPort().getName().equals("in") && !port.getChanged())
+                                                    port.setChanged();
                                             }
                                             break;
                                         case "Food":
                                             if(!(port.getPort().getType().getValue("calories") == input.value1)) {
                                                 port.getPort().getType().update("calories", input.value1);
-                                                port.setChanged();
+                                                if(port.getPort().getName().equals("in"))
+                                                    port.setChanged();
                                             }
                                             break;
                                     }
