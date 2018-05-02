@@ -1,7 +1,8 @@
-<project name="IJA-Projekt" default="compile" basedir=".">
+<project name="IJA-Projekt" default="run" basedir=".">
     <description>Aplikace pro návrh a editaci blokových schémat</description>
     <property name="src" location="src"/>
     <property name="build" location="build"/>
+    <property name="doc" location="doc/"/>
     <property name="src.main" location="src/main"/>
     <property name="build.main" location="build/"/>
     <property name="src.interfaces" location="src/interfaces"/>
@@ -18,39 +19,64 @@
         <pathelement location="${build.components}"/>
     </path>
 
-    <target name="sources-compile" description="compile the source" depends="clean">
-        <mkdir dir="${build.components}"/>
-        <mkdir dir="${build.main}"/>
-        <javac srcdir="${src.interfaces}" destdir="${build.interfaces}" includeantruntime="false"/>
-        <javac srcdir="${src.components}" destdir="${build.components}" includeantruntime="false"/>
-        <javac srcdir="${src.main}" classpath="${build.components}" destdir="${build.main}" includeantruntime="false"/>
+    <!-- překlad zdrojových kódů, zkopírování .fxml a obrázků do build -->
+    <target name="compile-sources" description="compile the source" depends="clean">
+        <javac srcdir="${src}" excludes="tests/*" destdir="${build}" includeantruntime="false"/>
+        <copy todir="${build}" >
+            <fileset dir="${src}" includes="**/*.fxml"/>
+            <fileset dir="lib" includes="**/*.png"/>
+        </copy>
     </target>
-<!-- prepared to make an run jar archive
-    <target name="compile-jar" depends="sources-compile" description="create .jar archive">
+
+    <!-- vygenerování dokumentace -->
+    <target name="doc" description="vygeneruje dokumentaci">
+        <javadoc locale="cs_CZ"
+                 packagenames="components, gui, interfaces"
+                 sourcepath="src"
+                 excludepackagenames="src.tests"
+                 defaultexcludes="yes"
+                 destdir="${doc}"
+                 author="true"
+                 version="true"
+                 use="true"
+                 windowtitle="IJA projekt"
+                 charset="UTF-8">
+            <doctitle><![CDATA[<h1>IJA projekt</h1>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright &#169; Jan Vávra (xvavra20), Aleš Postulka (xpostu03).</i>]]></bottom>
+        </javadoc>
+    </target>
+
+    <!-- vytvoření jar souboru -->
+    <target name="compile" depends="compile-sources, doc" description="create .jar archive">
         <mkdir dir="${dist}"/>
         <jar destfile="${dist}/ija-client.jar"
              basedir="${build}">
             <manifest>
                 <attribute name="Main-Class"
-                           value="main.Main"/>
+                           value="gui.Main"/>
             </manifest>
         </jar>
     </target>
 
-    <target name="run-jar" depends="compile-jar">
+
+    <!-- spuštění aplikace -->
+    <target name="run" depends="compile">
         <java jar="${dist}/ija-client.jar"
               dir="${dist}"
               fork="true"/>
     </target>
--->
-    <target name="compile" depends="sources-compile">
+
+    <!-- přeložení testů -->
+    <target name="tests-compile" depends="compile-sources">
         <mkdir dir="${build.tests}"/>
         <javac srcdir="${src.tests}" destdir="${build.tests}" includeantruntime="false">
             <classpath refid="classpath.tests"/>
         </javac>
     </target>
 
-    <target name="run" depends="clean, compile">
+
+    <!-- spuštění testů -->
+    <target name="test" depends="tests-compile">
         <junit printsummary="on" haltonfailure="yes" fork="true">
             <classpath>
                 <path refid="classpath.tests"/>
@@ -63,12 +89,12 @@
         </junit>
     </target>
 
+    <!-- vyčištění složek dest-client, build, doc -->
     <target name="clean" description="clean up">
-        <delete>
-            <fileset dir="${dist}" includes="**/*"/>
-        </delete>
         <delete includeemptydirs="true">
+            <fileset dir="${dist}" includes="**/*"/>
             <fileset dir="${build}" includes="**/*"/>
+            <fileset dir="${doc}" includes="**/*"/>
         </delete>
     </target>
 
