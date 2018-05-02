@@ -286,8 +286,15 @@ public class ControlerScheme{
                 if(newTranslateX <= 13){
                     newTranslateX = 13;
                 }
+                else if(newTranslateX >= 2360){
+                    newTranslateX = 2360;
+                }
+
                 if(newTranslateY <= 0){
                     newTranslateY = 0;
+                }
+                else if(newTranslateY >= 2408){
+                    newTranslateY = 2408;
                 }
 
                 ((Group)(event.getSource())).setTranslateX(newTranslateX);

@@ -19,7 +19,7 @@ public class Main extends Application {
         Scene scene = new Scene(root);
         //ScenicView.show(scene);
         stage.setScene(scene);
-        stage.setTitle("Human simulator");
+        stage.setTitle("Untitled - Human Simulator");
         stage.show();
     }
 
