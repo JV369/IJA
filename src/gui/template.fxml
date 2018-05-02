@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.Controller">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -29,14 +29,6 @@
                         <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
               <MenuItem fx:id="menuClose" mnemonicParsing="false" text="Close" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete">
-                     <accelerator>
-                        <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
-                     </accelerator></MenuItem>
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="Scheme">
@@ -61,13 +53,15 @@
       </MenuBar>
    </top>
    <left>
-      <ScrollPane fx:id="blockMenuPane" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="150.0" BorderPane.alignment="CENTER">
+      <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="150.0" BorderPane.alignment="CENTER">
          <content>
             <VBox fx:id="blockMenu" alignment="TOP_CENTER" prefHeight="569.0" prefWidth="150.0" />
          </content>
       </ScrollPane>
    </left>
    <center>
-       <AnchorPane fx:id="GUIScheme" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+       <ScrollPane BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="GUIScheme" prefHeight="2500.0" prefWidth="2500.0" BorderPane.alignment="CENTER" />
+       </ScrollPane>
    </center>
 </BorderPane>

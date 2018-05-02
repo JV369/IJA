@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -88,9 +89,13 @@ public class Controller extends BorderPane {
             public void handle(ActionEvent actionEvent) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Save file");
-                fileChooser.setInitialFileName("simulation.ser");
+                fileChooser.setInitialFileName("simulation.sim");
                 File file = fileChooser.showSaveDialog(new Stage());
-                controlerScheme.getScheme().saveFile(file);
+                if(file != null) {
+                    Stage stage = (Stage) GUIScheme.getScene().getWindow();
+                    stage.setTitle(file.getName() + " - Human Simulator");
+                    controlerScheme.getScheme().saveFile(file);
+                }
             }
         });
 
@@ -102,6 +107,8 @@ public class Controller extends BorderPane {
                 File file = fileChooser.showOpenDialog(new Stage());
                 if(file != null){
                     try {
+                        Stage stage = (Stage) GUIScheme.getScene().getWindow();
+                        stage.setTitle(file.getName() + " - Human Simulator");
                         FileInputStream stream = new FileInputStream(file);
                         ObjectInputStream objStream = new ObjectInputStream(stream);
                         controlerScheme.clearScene();
@@ -338,6 +345,7 @@ public class Controller extends BorderPane {
         else {
             //remember clicked block
             selected = true;
+            doubleClick = false;
             if(selectedBlock != null)
                 selectedBlock.setStyle("");
             selectedBlock = block;

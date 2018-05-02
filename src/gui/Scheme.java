@@ -116,8 +116,6 @@ public class Scheme {
      * @return true pokud se podařilo data uložit, jinak false
      */
     public boolean saveFile(File file){
-        if(file == null)
-            return false;
         try {
             FileOutputStream stream = new FileOutputStream(file);
             ObjectOutputStream objStream = new ObjectOutputStream(stream);
