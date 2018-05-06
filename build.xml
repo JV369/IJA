@@ -70,6 +70,7 @@
 
     <!-- přeložení testů -->
     <target name="tests-compile" depends="compile-sources">
+        <exec dir="lib" executable="./get-libs.sh"/>
         <mkdir dir="${build.tests}"/>
         <javac srcdir="${src.tests}" destdir="${build.tests}" includeantruntime="false">
             <classpath refid="classpath.tests"/>
