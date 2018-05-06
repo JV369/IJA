@@ -40,7 +40,7 @@ public class BlockEatTest {
         block.getInPort(0).getType().update("stamina", 50.0);
         block.execute();
         assertEquals("Test stamina after eat", 63.819789939, block.getOutPort(0).getType().getValue("stamina"), 0.001);
-        assertEquals("Test weight after eat", 80.33, block.getOutPort(0).getType().getValue("weight"), 0.001);
+        assertEquals("Test weight after eat", 80.333, block.getOutPort(0).getType().getValue("weight"), 0.001);
     }
 
 }

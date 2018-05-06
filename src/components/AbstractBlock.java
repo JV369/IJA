@@ -91,8 +91,8 @@ public abstract class AbstractBlock implements Block{
 
     /**
      * uloží si souřadnice x,y výskytu na scéně
-     * @param newX
-     * @param newY
+     * @param newX nová souřadnice x
+     * @param newY nová souřadnice y
      */
     public void setCoordinates(double newX, double newY){
         this.x_coord = newX;
